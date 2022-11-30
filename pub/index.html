@@ -14,19 +14,24 @@
     <body id="app">
         <h1>Mycelium Chat</h1>
         <div id="user-list-box">
-            <p>{{id}}</p>
+            <p></p>
         </div>
         <div id="chat-box">
-            <div v-for="(data, idx) in history">
+            <div v-for="data in history">
                 <div class="message-meta">
                     <p class="author">{{ data.author }}</p>
                     <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
+                    <div v-if="data.author == author">
+                        <p @click="updateChat('update', data)">Edit</p>
+                        <p @click="updateChat('delete', data)">Delete</p>
+                    </div>
                 </div>
                 <div class="message-body">
-                    <p> {{ data.message }} </p>
+                    <p> {{ data.text }} </p>
                 </div>
+                <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
             </div>
-            <input id="message-input" v-model="text" placeholder="edit me" @change="message_send()"/>
+            <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
         </div>
     </body>
 </html>

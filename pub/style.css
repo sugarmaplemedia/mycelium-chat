@@ -3,7 +3,9 @@ html {
 }
 
 #chat-box {
+    height: 1000px;
     width: 900px;
+    overflow-y: scroll;
 }
 
 .message-meta {
