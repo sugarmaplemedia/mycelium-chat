@@ -34,6 +34,8 @@ Vue.createApp({
                     break;
             }
         });
+
+        socket.emit("updateChat", "user", {status: 'joined', user: this.author});
     },
     methods: {
         // Take text from an input box and send it to the server in order to:
