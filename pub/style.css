@@ -1,0 +1,19 @@
+html {
+    font-family: nunito;
+}
+
+#chat-box {
+    width: 900px;
+}
+
+.message-meta {
+    width: 180px;
+    display: flex;
+    justify-content: space-between;
+
+    font-weight: bold;
+}
+
+#message-input {
+    width: 100%;
+}
