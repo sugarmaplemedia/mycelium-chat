@@ -21,6 +21,10 @@
                 <div class="message-meta">
                     <p class="author">{{ data.author }}</p>
                     <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
+                    <div v-if="data.author == author">
+                        <p @click="editMessage">Edit</p>
+                        <p @click="deleteMessage">Delete</p>
+                    </div>
                 </div>
                 <div class="message-body">
                     <p> {{ data.message }} </p>

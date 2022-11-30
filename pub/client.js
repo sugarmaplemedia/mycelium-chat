@@ -36,6 +36,12 @@ Vue.createApp({
                 this.text = "";
             }
         },
+        editMessage() {
+            console.log("edit message");
+        },
+        deleteMessage() {
+            console.log("delete message");
+        },
     },
     computed: {
     },

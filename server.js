@@ -97,3 +97,5 @@ io.on("connection", (socket) => {
         message_handler(event, data, socket);
     })
 });
+
+console.log(HISTORY);
