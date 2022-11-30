@@ -1,26 +1,28 @@
+// Socket.io Client setup
 var socket = io();
 
+// What are these vars for? Please define
 const MESSAGE    = 0;
 const USER       = 1;
 const EVENT_SIZE = 2;
 
-let app = Vue.createApp({
+Vue.createApp({
     data() {
         return {
             submit: false,
             text: "",
             author: "aks",
-            history: [],
-            id: socket.id
+            history: []
         };
     },
     created() {
+        // I don't think this is necessary - Harrison
         window.addEventListener('keydown', (e) => {
             if (e.key == 'Enter') {
                 this.submit = true;
             }
         });
-
+        // Ditto ^ - Harrison
         window.addEventListener('keyup', (e) => {
             if(e.key == 'Enter') {
                 this.submit = false;

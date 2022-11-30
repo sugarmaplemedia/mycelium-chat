@@ -11,7 +11,7 @@
     "url": "git+https://github.com/sugarmaplemedia/mycelium-chat.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "None",
   "bugs": {
     "url": "https://github.com/sugarmaplemedia/mycelium-chat/issues"
   },
@@ -19,5 +19,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
