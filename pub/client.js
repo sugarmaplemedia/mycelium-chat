@@ -1,56 +1,78 @@
 // Socket.io Client setup
 var socket = io();
 
-// What are these vars for? Please define
-const MESSAGE    = 0;
-const USER       = 1;
-const EVENT_SIZE = 2;
-
+// Vue app
 Vue.createApp({
     data() {
         return {
-            submit: false,
-            text: "",
-            author: "aks",
-            history: []
+            text: "", // Input text for submitting new messages
+            editText: "", // Input text for editing messages
+            author: "aks", // The message author
+            history: [] // Chat history
         };
     },
-    created() {
-        // I don't think this is necessary - Harrison
-        window.addEventListener('keydown', (e) => {
-            if (e.key == 'Enter') {
-                this.submit = true;
-            }
+    mounted() {
+        // Initialize chat
+        socket.on("init", (chat) => {
+            this.history = chat;
         });
-        // Ditto ^ - Harrison
-        window.addEventListener('keyup', (e) => {
-            if(e.key == 'Enter') {
-                this.submit = false;
+
+        // Receive message from server, and:
+        socket.on("updateChat", (action, message) => {
+            switch (action) {
+                // push that message to the chat history
+                case "new":
+                    this.history.push(message);
+                    break;
+                // use that message's ID to update a message in the chat history
+                case "update":
+                    this.history[this.history.findIndex(msg => msg.id == message.id)] = message;
+                    break;
+                // use that message's ID to delete a message from the chat history 
+                case "delete":
+                    this.history.splice(this.history.findIndex(msg => msg.id == message.id), 1);
+                    break;
             }
         });
     },
     methods: {
-        message_send() {
-            if(this.submit && this.text != "") {
-                socket.emit("event", MESSAGE ,{"message": this.text, "author": this.author});
-                this.text = "";
+        // Take text from an input box and send it to the server in order to:
+        updateChat(action, message) {
+            switch (action) {
+                // push a new message to the chat history
+                case "new":
+                    if(this.text != "") {
+                        socket.emit("updateChat", "new",
+                            {
+                                text: this.text,
+                                author: this.author
+                            }
+                        );
+                        this.text = "";
+                    }
+                    break;
+                // update a message within the chat history
+                case "update":
+                    // This ensures only one edit textbox is open at a time
+                    if (!message.editMessage) {
+                        this.history.forEach(msg => msg.editMessage = false);
+                        message.editMessage = true;
+                    } else {
+                        socket.emit("updateChat", "update",
+                            {
+                                id: message.id,
+                                text: this.editText
+                            }
+                        );
+                        message.editMessage = false;
+                        this.editText = "";
+                    }
+                    break;
+                // Delete a message from the chat history
+                case "delete":
+                    socket.emit("updateChat", "delete", message);
+                    break;
             }
-        },
-        editMessage() {
-            console.log("edit message");
-        },
-        deleteMessage() {
-            console.log("delete message");
-        },
-    },
-    computed: {
-    },
-    mounted() {
-        socket.on("update", (d) => {
-            this.history.push(d);
-        })
-        socket.on("init", (x) => {
-            this.history = x;
-        });
-    },
+        }
+    }
 }).mount('#app');
