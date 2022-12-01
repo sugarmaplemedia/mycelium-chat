@@ -8,13 +8,25 @@ Vue.createApp({
             text: "", // Input text for submitting new messages
             editText: "", // Input text for editing messages
             author: "aks", // The message author
-            history: [] // Chat history
+            history: [], // Chat history
+            users: [] // Users connected to chat
         };
     },
     mounted() {
         // Initialize chat
         socket.on("init", (chat) => {
             this.history = chat;
+        });
+
+        socket.on("updateUsers", (action, userName) => {
+            switch (action) {
+                case "add":
+                    users.push(userName);
+                    break;
+                case "remove":
+                    users.splice(users.findIndex(user => user == userName), 1);
+                    break;
+            }
         });
 
         // Receive message from server, and:
@@ -35,7 +47,7 @@ Vue.createApp({
             }
         });
 
-        socket.emit("updateChat", "user", {status: 'joined', user: this.author});
+        socket.emit("updateUsers", this.author);
     },
     methods: {
         // Take text from an input box and send it to the server in order to:

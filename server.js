@@ -24,6 +24,7 @@ const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history 
 
 /** GLOBALS */
 const chatHistory = load_chat_history();
+const usersList = new Map();
 
 /* SERVER FUNCTIONS */
 
@@ -57,6 +58,11 @@ io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
     socket.emit("init", chatHistory);
 
+    socket.on("updateUsers", userName => {
+        usersList.set(socket.id, userName);
+        io.emit("updateUsers", "add", userName);
+    });
+
     // Receive a message from the client, and:
     socket.on("updateChat", (action, message) => {
         switch (action) {
@@ -89,5 +95,6 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log(socket.id + " disconnected");
+        usersList.delete(socket.id);
     });
 });
