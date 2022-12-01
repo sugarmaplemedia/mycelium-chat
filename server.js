@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log(socket.id + " disconnected");
+        io.emit("updateUsers", "remove", usersList.get(socket.id));
         usersList.delete(socket.id);
     });
 });
