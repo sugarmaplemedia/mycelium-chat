@@ -31,7 +31,7 @@ const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history 
 const chatHistory = load_chat_history();
 var Users = new Map();
 
-/** SERVER FUNCTIONS */
+/* SERVER FUNCTIONS */
 
 /** Load designated chat history file from file system */
 function load_chat_history() {
@@ -43,7 +43,7 @@ function load_chat_history() {
     return [];
 }
 
-/** Save local chat histroy array to file */
+/** Save local chat history array to file */
 function save_chat_history() {
     fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
         if (err) console.log(err);
@@ -52,7 +52,7 @@ function save_chat_history() {
 }
 
 
-/** EVENT HANDLES */
+/* EVENT HANDLES */
 function user_handle(x, socket, obj) {
     let ret = false;
     if(!Users.has(x.user))
@@ -72,7 +72,7 @@ function msg_handle(message)
         editMessage: false,
         author: message.author,
         timestamp: Date.now(),
-        id: generateMessageId()
+        id: base64id.generateId()
     };
 
     chatHistory.push(newMessage);
@@ -87,11 +87,6 @@ function format_user_string(e, name, obj) {
     } else {
         obj.text = (name + STR_USER_JOIN + STR_DEFAULT_SERVER);
     }
-}
-// Create unique id for each message, referenced when updating messages
-function generateMessageId() {
-    /** Will be unique per npmjs.com/package/base64id, no need to store and check (slow) */
-    return base64id.generateId();
 }
 
 process.on("SIGINT", (signal) => {
