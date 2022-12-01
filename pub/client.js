@@ -18,6 +18,10 @@ Vue.createApp({
             this.history = chat;
         });
 
+        /** Receive users from server, and:
+         *    add: add them to the list
+         *    remove: remove them from the list
+         */
         socket.on("updateUsers", (action, userName) => {
             switch (action) {
                 case "add":

@@ -58,6 +58,10 @@ io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
     socket.emit("init", chatHistory);
 
+    /** A user gives the server their username
+     *    adds user ID and name to mapped list
+     *    sends new user data to clients
+     */
     socket.on("updateUsers", userName => {
         usersList.set(socket.id, userName);
         io.emit("updateUsers", "add", userName);
@@ -93,6 +97,11 @@ io.on("connection", (socket) => {
         }
     });
 
+    /** A user disconnects from the server
+     *    Log their disconnection
+     *    Tell users the username who left
+     *    Remove user from mapped list
+     */
     socket.on("disconnect", () => {
         console.log(socket.id + " disconnected");
         io.emit("updateUsers", "remove", usersList.get(socket.id));
