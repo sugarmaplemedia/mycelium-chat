@@ -21,10 +21,10 @@ Vue.createApp({
         socket.on("updateUsers", (action, userName) => {
             switch (action) {
                 case "add":
-                    users.push(userName);
+                    this.users.push(userName);
                     break;
                 case "remove":
-                    users.splice(users.findIndex(user => user == userName), 1);
+                    this.users.splice(this.users.findIndex(user => user == userName), 1);
                     break;
             }
         });
