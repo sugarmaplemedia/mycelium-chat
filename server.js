@@ -1,3 +1,4 @@
+/** Required Files */
 var express = require("express");
 var fs = require('fs');
 var http = require("http");
@@ -7,7 +8,6 @@ var base64id = require('base64id'); /**< Base64ID setup (for generating message 
 /** Express setup */
 var app = express();
 app.use(express.static("pub"));
-
 var server = http.Server(app);
 
 /** Socket.io setup */
@@ -19,17 +19,11 @@ server.listen(PORT, () => {
     console.log(`server is listening on port ${PORT}`);
 });
 
-/** DEFNS */
-const STR_DEFAULT_SERVER = "global.";      /**< default server if none defined */
-const STR_USER_JOIN      = " has joined "; /**< default join message  */
-const STR_USER_LEAVE     = " has left ";   /**< default leave message  */
-
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
 const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
 const chatHistory = load_chat_history();
-var Users = new Map();
 
 /* SERVER FUNCTIONS */
 
@@ -51,45 +45,7 @@ function save_chat_history() {
     });
 }
 
-
-/* EVENT HANDLES */
-function user_handle(x, socket, obj) {
-    let ret = false;
-    if(!Users.has(x.user))
-    {
-        format_user_string(x.status, x.user, obj);
-        ret = true;
-    }
-    Users.set(x.user, socket.id);
-    console.log(Users);
-    return ret;
-}
-
-function msg_handle(message)
-{
-    let newMessage = {
-        text: message.text,
-        editMessage: false,
-        author: message.author,
-        timestamp: Date.now(),
-        id: base64id.generateId()
-    };
-
-    chatHistory.push(newMessage);
-    io.emit("updateChat", "new", newMessage);
-}
-
-/** HELPER FUNCTIONS */
-function format_user_string(e, name, obj) {
-    obj.author = name;
-    if(e == 'left') {
-        obj.text =  (name + STR_USER_LEAVE + STR_DEFAULT_SERVER );
-    } else {
-        obj.text = (name + STR_USER_JOIN + STR_DEFAULT_SERVER);
-    }
-}
-
-process.on("SIGINT", (signal) => {
+process.on("SIGINT", () => {
     save_chat_history();
     console.log(chatHistory);
     console.log(`Process ${process.pid} has been interrupted`);
@@ -106,7 +62,16 @@ io.on("connection", (socket) => {
         switch (action) {
             // Record it to the server chat history, and push that message to all clients
             case "new":
-                msg_handle(message);
+                let newMessage = {
+                    text: message.text,
+                    editMessage: false,
+                    author: message.author,
+                    timestamp: Date.now(),
+                    id: base64id.generateId()
+                };
+            
+                chatHistory.push(newMessage);
+                io.emit("updateChat", "new", newMessage);
                 break;
             // Update a message in the server chat history, and push that update to all clients
             case "update":
@@ -118,14 +83,6 @@ io.on("connection", (socket) => {
             case "delete":
                 chatHistory.splice(chatHistory.findIndex(msg => msg.id == message.id), 1);
                 io.emit("updateChat", "delete", message);
-                break;
-
-            case "user":
-                let x = {author: '', text: ''};
-                if(user_handle(message, socket, x))
-                {
-                    msg_handle(x);
-                }
                 break;
         }
     });
