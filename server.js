@@ -1,69 +1,56 @@
-// Express setup
+/** Required Files */
 var express = require("express");
+var fs = require('fs');
+var http = require("http");
+var socketio = require("socket.io");
+var base64id = require('base64id'); /**< Base64ID setup (for generating message IDs) */
+
+/** Express setup */
 var app = express();
 app.use(express.static("pub"));
-var http = require("http");
 var server = http.Server(app);
 
-// Socket.io setup
-var socketio = require("socket.io");
+/** Socket.io setup */
 var io = socketio(server);
 
-// Base64ID setup (for generating message IDs)
-var base64id = require('base64id');
-
-// Environment variables
+/** Environment variables */
 const PORT = process.env.PORT || 8082;
 server.listen(PORT, () => {
     console.log(`server is listening on port ${PORT}`);
 });
 
-/* Anthony please comment these variables and functions */
-/** DEFNS */
-const USER_JOIN  = 1;
-const USER_LEAVE = 2;
-const EVENT_SIZE = 3;
-
-const STR_DEFAULT_SERVER = "global.";
-const STR_USER_JOIN      = " has joined ";
-const STR_USER_LEAVE     = " has left ";
+const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
+const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
-const chatHistory = [];
-const idHistory = [];
-var USER_HISTORY = new Map();
+const chatHistory = load_chat_history();
 
-/** EVENT HANDLES */
-function user_handle(action, data, socket, obj) {
-    let ret = false;
-    if(!USER_HISTORY.has(data.author))
-    {
-        obj.message = format_user_string(action, data);
-        ret = true;
+/* SERVER FUNCTIONS */
+
+/** Load designated chat history file from file system */
+function load_chat_history() {
+    try {
+        return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
+    } catch(err) {
+        console.log(err.code);
     }
-    USER_HISTORY.set(data.author, socket.id);
-    console.log(USER_HISTORY);
-    return ret;
+    return [];
 }
 
-/** HELPER FUNCTIONS */
-// ?
-function format_user_string(e, data) {
-    if(e == USER_LEAVE) {
-        return (data.author + STR_USER_LEAVE + STR_DEFAULT_SERVER)
-    } else {
-        return (data.author + STR_USER_JOIN + STR_DEFAULT_SERVER)
-    }
+/** Save local chat history array to file */
+function save_chat_history() {
+    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
+        if (err) console.log(err);
+        console.log('Successfuly written to the file!');
+    });
 }
-// Create unique id for each message, referenced when updating messages
-function generateMessageId() {
-    let newId;
-    do {
-        newId = base64id.generateId();
-    } while (idHistory.includes(newId));
-    idHistory.push(newId);
-    return newId;
-}
+
+process.on("SIGINT", () => {
+    save_chat_history();
+    console.log(chatHistory);
+    console.log(`Process ${process.pid} has been interrupted`);
+    process.exit(0);
+});
 
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
@@ -80,9 +67,9 @@ io.on("connection", (socket) => {
                     editMessage: false,
                     author: message.author,
                     timestamp: Date.now(),
-                    id: generateMessageId()
+                    id: base64id.generateId()
                 };
-        
+            
                 chatHistory.push(newMessage);
                 io.emit("updateChat", "new", newMessage);
                 break;
