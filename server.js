@@ -14,18 +14,23 @@ var server = http.Server(app);
 var io = socketio(server);
 
 /** Environment variables */
-const PORT = process.env.PORT || 8082;
-server.listen(PORT, () => {
-    console.log(`server is listening on port ${PORT}`);
-});
-
+const PORT = process.env.PORT || 8082; /**< default server port */
+server.listen(PORT, () => console.log(`server is listening on port ${PORT}`));
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
 const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
-const chatHistory = load_chat_history();
 const usersList = new Map();
-const roomsList = ["global network", "the mushroom", "pretty fly (for a fungi)"]
+const roomsList = ["global network", "the mushroom", "pretty fly (for a fungi)"];
+let chatHistory;
+if (!(chatHistory = load_chat_history())) {
+    chatHistory = {};
+    for (room of roomsList) {
+        chatHistory[room] = [];
+    }
+}
+
+console.log(chatHistory);
 
 /* SERVER FUNCTIONS */
 
@@ -34,22 +39,24 @@ function load_chat_history() {
     try {
         return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
     } catch(err) {
-        console.log(err.code);
+        console.log(`Error: ${CHAT_HISTORY_FNAME} is ${err.code}`);
     }
-    return [];
+    return undefined;
 }
 
 /** Save local chat history array to file */
 function save_chat_history() {
     fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
-        if (err) console.log(err);
-        console.log('Successfuly written to the file!');
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Successfuly written to the file!');
+        }
     });
 }
 
 process.on("SIGINT", () => {
     save_chat_history();
-    console.log(chatHistory);
     console.log(`Process ${process.pid} has been interrupted`);
     process.exit(0);
 });

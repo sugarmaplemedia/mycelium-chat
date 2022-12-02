@@ -24,6 +24,8 @@ Vue.createApp({
             this.rooms = rooms;
         });
 
+        socket.on("testFunc", chat => console.log(typeof(chat)));
+
         /** Receive users from server, and:
          *    add: add them to the list of users
          *    remove: remove them from the list of users
