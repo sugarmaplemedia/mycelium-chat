@@ -17,9 +17,15 @@
             <div id="userdata-content" class="modalContent">
                 <label for="username-set">Enter Username:</label>
                 <input id="username-set" type="text" />
+                <br>
+                <p id="no"></p>
+                <label for="room-set">Choose a chatroom to enter:</label>
+                <br>
                 <select id="room-set">
                     <option v-for="room in rooms" :value="room">{{room}}</option>
                 </select>
+                <br>
+                <br>
                 <button @click="setUserData">submit</button>
             </div>
         </div>

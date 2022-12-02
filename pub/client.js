@@ -78,11 +78,22 @@ Vue.createApp({
         },
         /** Set username and room, and send them to the server */
         setUserData(){
-            this.room = document.getElementById("room-set").value;
-            this.author = document.getElementById("username-set").value;
-            socket.emit("setUserData", this.room, this.author);
-
-            this.showModal();
+            let matched = false;
+            document.getElementById("no").innerText("");
+            for(user of this.users()){
+                if(document.getElementById("username-set").value == user){
+                    matched = true;
+                }
+            }
+            if(matched == true){
+                document.getElementById("no").innerText("That user name is already taken you stupid fucking idiot.");
+            }   
+            if(matched == false){
+                this.room = document.getElementById("room-set").value;
+                this.author = document.getElementById("username-set").value;
+                socket.emit("setUserData", this.room, this.author);
+                this.showModal();
+            }
         },
         /** Take text from an input box and send it to the server in order to:
          *    new: push a new message to the chat history
