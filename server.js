@@ -17,7 +17,7 @@ var io = socketio(server);
 const PORT = process.env.PORT || 8082; /**< default server port */
 server.listen(PORT, () => console.log(`server is listening on port ${PORT}`));
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
-const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
+const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
 const usersList = new Map();
@@ -38,7 +38,7 @@ console.log(chatHistory);
 function load_chat_history() {
     try {
         return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
-    } catch(err) {
+    } catch (err) {
         console.log(`Error: ${CHAT_HISTORY_FNAME} is ${err.code}`);
     }
     return undefined;
@@ -46,7 +46,7 @@ function load_chat_history() {
 
 /** Save local chat history array to file */
 function save_chat_history() {
-    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
+    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, { type: "application/json;charset=utf-8" }), (err) => {
         if (err) {
             console.log(err);
         } else {
@@ -89,19 +89,19 @@ io.on("connection", (socket) => {
                     timestamp: Date.now(),
                     id: base64id.generateId()
                 };
-            
-                chatHistory.push(newMessage);
+
+                chatHistory[room].push(newMessage);
                 io.to(room).emit("updateChat", "new", newMessage);
                 break;
             // Update a message in the server chat history, and push that update to all clients
             case "update":
-                let updatedMessage = chatHistory[chatHistory.findIndex(msg => msg.id == message.id)];
+                let updatedMessage = chatHistory[room][chatHistory[room].findIndex(msg => msg.id == message.id)];
                 updatedMessage.text = message.text;
                 io.to(room).emit("updateChat", "update", updatedMessage);
                 break;
             // Delete that message from the server chat history and all client chat histories
             case "delete":
-                chatHistory.splice(chatHistory.findIndex(msg => msg.id == message.id), 1);
+                chatHistory[room].splice(chatHistory[room].findIndex(msg => msg.id == message.id), 1);
                 io.to(room).emit("updateChat", "delete", message);
                 break;
         }
