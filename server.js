@@ -21,7 +21,7 @@ const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history p
 
 /** GLOBALS */
 const usersList = new Map();
-const roomsList = ["global", "the mushroom", "pretty fly (for a fungi)"];
+const roomsList = ["global", "the mushroom", "pretty fly (for a fungi)", "domestic terrorism"];
 let chatHistory;
 if (!(chatHistory = load_chat_history())) {
     chatHistory = {};
@@ -29,8 +29,6 @@ if (!(chatHistory = load_chat_history())) {
         chatHistory[room] = [];
     }
 }
-
-console.log(chatHistory);
 
 /* SERVER FUNCTIONS */
 
