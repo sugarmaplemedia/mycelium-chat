@@ -91,6 +91,11 @@ Vue.createApp({
                     socket.emit("updateChat", "delete", message);
                     break;
             }
-        }
+        },
+        setUsername(){
+            console.log(this.author);
+            console.log(document.getElementById("usernameModal"));
+            document.getElementById("usernameModal").classList.toggle("show-modal"); 
+        },
     }
 }).mount('#app');
