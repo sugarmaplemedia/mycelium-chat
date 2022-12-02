@@ -20,7 +20,7 @@ html {
     width: 100%;
 }
 
-.modal {
+#userdata-modal {
     position: fixed;
     left: 0;
     top: 0;
@@ -32,7 +32,7 @@ html {
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
 }
 
-.modalContent {
+#userdata-content {
     position: absolute;
     top: 50%;
     left: 50%;

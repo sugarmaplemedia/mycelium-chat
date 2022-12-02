@@ -25,6 +25,7 @@ const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history 
 /** GLOBALS */
 const chatHistory = load_chat_history();
 const usersList = new Map();
+const roomsList = ["global network", "the mushroom", "pretty fly (for a fungi)"]
 
 /* SERVER FUNCTIONS */
 
@@ -56,19 +57,21 @@ process.on("SIGINT", () => {
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
-    socket.emit("init", chatHistory);
+    socket.emit("init", chatHistory, roomsList);
 
-    /** A user gives the server their username
+    /** A user gives the server their room and username
+     *    sends user to room
      *    adds user ID and name to mapped list
      *    sends new user data to clients
      */
-    socket.on("updateUsers", userName => {
-        usersList.set(socket.id, userName);
-        io.emit("updateUsers", "add", userName);
+    socket.on("setUserData", (room, username) => {
+        socket.join(room);
+        usersList.set(socket.id, username);
+        io.emit("updateUsers", "add", username);
     });
 
     // Receive a message from the client, and:
-    socket.on("updateChat", (action, message) => {
+    socket.on("updateChat", (room, action, message) => {
         switch (action) {
             // Record it to the server chat history, and push that message to all clients
             case "new":
@@ -81,18 +84,18 @@ io.on("connection", (socket) => {
                 };
             
                 chatHistory.push(newMessage);
-                io.emit("updateChat", "new", newMessage);
+                io.to(room).emit("updateChat", "new", newMessage);
                 break;
             // Update a message in the server chat history, and push that update to all clients
             case "update":
                 let updatedMessage = chatHistory[chatHistory.findIndex(msg => msg.id == message.id)];
                 updatedMessage.text = message.text;
-                io.emit("updateChat", "update", updatedMessage);
+                io.to(room).emit("updateChat", "update", updatedMessage);
                 break;
             // Delete that message from the server chat history and all client chat histories
             case "delete":
                 chatHistory.splice(chatHistory.findIndex(msg => msg.id == message.id), 1);
-                io.emit("updateChat", "delete", message);
+                io.to(room).emit("updateChat", "delete", message);
                 break;
         }
     });
