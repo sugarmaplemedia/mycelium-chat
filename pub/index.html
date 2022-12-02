@@ -34,7 +34,11 @@
                     </div>
                 </div>
                 <div class="message-body">
-                    <p> {{ data.text }} </p>
+                    <!-- This should be more creative something with a background color or something -->
+                    <strong v-if="check_for_mention(data.text)">
+                        <p> {{ data.text }} </p>
+                    </strong>
+                    <p v-else> {{ data.text }} </p>
                 </div>
                 <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
             </div>

@@ -46,11 +46,16 @@ function save_chat_history() {
     });
 }
 
+/* PROCESS EVENTS */
 process.on("SIGINT", () => {
     save_chat_history();
-    console.log(chatHistory);
     console.log(`Process ${process.pid} has been interrupted`);
     process.exit(0);
+});
+
+process.on('exit', (code) => {
+    save_chat_history();
+    console.log('Process exit event with code: ', code);
 });
 
 /* WEBSOCKET FUNCTIONS */
