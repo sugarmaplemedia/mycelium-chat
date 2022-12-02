@@ -7,8 +7,8 @@ Vue.createApp({
         return {
             text: "", // Input text for submitting new messages
             editText: "", // Input text for editing messages
-            author: "", // The message author
-            history: [] // Chat history
+            author: "guest", // The message author
+            history: [], // Chat history
             users: [] // Users connected to chat
         };
     },
@@ -114,8 +114,10 @@ Vue.createApp({
             return false;
         },
         setUsername(){
-            console.log(this.author);
-            console.log(document.getElementById("usernameModal"));
+            if(this.author === "guest")
+            {
+                this.author += '-' + this.makeid(5);
+            }
             document.getElementById("usernameModal").classList.toggle("show-modal"); 
         },
     }
