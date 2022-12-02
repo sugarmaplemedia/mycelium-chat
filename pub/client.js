@@ -76,9 +76,7 @@ Vue.createApp({
                     break;
             }
         },
-        setUsername(){
-            console.log(this.author);
-            console.log(document.getElementById("usernameModal"));
+        setUsername(){  
             document.getElementById("usernameModal").classList.toggle("show-modal"); 
         },
     }
