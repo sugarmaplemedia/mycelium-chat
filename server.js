@@ -14,17 +14,21 @@ var server = http.Server(app);
 var io = socketio(server);
 
 /** Environment variables */
-const PORT = process.env.PORT || 8082;
-server.listen(PORT, () => {
-    console.log(`server is listening on port ${PORT}`);
-});
-
+const PORT = process.env.PORT || 8082; /**< default server port */
+server.listen(PORT, () => console.log(`server is listening on port ${PORT}`));
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
-const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
+const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
-const chatHistory = load_chat_history();
 const usersList = new Map();
+const roomsList = ["global", "the mushroom", "pretty fly (for a fungi)", "domestic terrorism"];
+let chatHistory;
+if (!(chatHistory = load_chat_history())) {
+    chatHistory = {};
+    for (room of roomsList) {
+        chatHistory[room] = [];
+    }
+}
 
 /* SERVER FUNCTIONS */
 
@@ -32,17 +36,20 @@ const usersList = new Map();
 function load_chat_history() {
     try {
         return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
-    } catch(err) {
-        console.log(err.code);
+    } catch (err) {
+        console.log(`Error: ${CHAT_HISTORY_FNAME} is ${err.code}`);
     }
-    return [];
+    return undefined;
 }
 
 /** Save local chat history array to file */
 function save_chat_history() {
-    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
-        if (err) console.log(err);
-        console.log('Successfuly written to the file!');
+    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, { type: "application/json;charset=utf-8" }), (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Successfuly written to the file!');
+        }
     });
 }
 
@@ -61,21 +68,27 @@ process.on('exit', (code) => {
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
-    socket.emit("init", chatHistory);
+    socket.emit("init", chatHistory.global, roomsList);
 
-    /** A user gives the server their username
+    /** A user gives the server their room and username
+     *    sends user to room
      *    adds user ID and name to mapped list
      *    sends new user data to clients
      */
-    socket.on("updateUsers", userName => {
-        usersList.set(socket.id, userName);
-        io.emit("updateUsers", "add", userName);
+    socket.on("setUserData", (room, username) => {
+        socket.join(room);
+        usersList.set(socket.id, username);
+        socket.emit("setRoomHistory", chatHistory[room]);
+        io.emit("updateUsers", "add", username);
     });
 
-    // Receive a message from the client, and:
-    socket.on("updateChat", (action, message) => {
+    /** Receive a message from the client, and:
+     *    new: record it to the server chat history, and push that message to all clients
+     *    update: update a message in the server chat history, and push that update to all clients
+     *    delete: delete that message from the server chat history and all client chat histories
+     */
+    socket.on("updateChat", (room, action, message) => {
         switch (action) {
-            // Record it to the server chat history, and push that message to all clients
             case "new":
                 let newMessage = {
                     text: message.text,
@@ -84,28 +97,26 @@ io.on("connection", (socket) => {
                     timestamp: Date.now(),
                     id: base64id.generateId()
                 };
-            
-                chatHistory.push(newMessage);
-                io.emit("updateChat", "new", newMessage);
+
+                chatHistory[room].push(newMessage);
+                io.to(room).emit("updateChat", "new", newMessage);
                 break;
-            // Update a message in the server chat history, and push that update to all clients
             case "update":
-                let updatedMessage = chatHistory[chatHistory.findIndex(msg => msg.id == message.id)];
+                let updatedMessage = chatHistory[room][chatHistory[room].findIndex(msg => msg.id == message.id)];
                 updatedMessage.text = message.text;
-                io.emit("updateChat", "update", updatedMessage);
+                io.to(room).emit("updateChat", "update", updatedMessage);
                 break;
-            // Delete that message from the server chat history and all client chat histories
             case "delete":
-                chatHistory.splice(chatHistory.findIndex(msg => msg.id == message.id), 1);
-                io.emit("updateChat", "delete", message);
+                chatHistory[room].splice(chatHistory[room].findIndex(msg => msg.id == message.id), 1);
+                io.to(room).emit("updateChat", "delete", message);
                 break;
         }
     });
 
     /** A user disconnects from the server
-     *    Log their disconnection
-     *    Tell users the username who left
-     *    Remove user from mapped list
+     *    log their disconnection
+     *    tell users the username who left
+     *    remove user from mapped list
      */
     socket.on("disconnect", () => {
         console.log(socket.id + " disconnected");

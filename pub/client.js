@@ -1,15 +1,20 @@
-// Socket.io Client setup
-var socket = io();
+/** Socket.io client-side setup */
+const socket = io();
 
-// Vue app
+/** Vue app setup */
 Vue.createApp({
     data() {
         return {
-            text: "", // Input text for submitting new messages
-            editText: "", // Input text for editing messages
-            author: "guest", // The message author
+            /** Metadata */
+            author: "guest", // Client username
+            room: "", // Room the client is in
+            users: [], // Users connected to chat
+            rooms: [], // Available rooms to join
             history: [], // Chat history
-            users: [] // Users connected to chat
+
+            /** Messaging */
+            text: "", // Input text for submitting new messages
+            editText: "" // Input text for editing messages
         };
     },
     created() {
@@ -20,14 +25,20 @@ Vue.createApp({
         }
     },
     mounted() {
-        // Initialize chat
-        socket.on("init", (chat) => {
+        /** Initialize global chatroom */
+        socket.on("init", (chat, rooms) => {
             this.history = chat;
+            this.rooms = rooms;
+        });
+
+        /** Receive room chat history and switch over viewable messages */
+        socket.on("setRoomHistory", roomHistory => {
+            this.history = roomHistory;
         });
 
         /** Receive users from server, and:
-         *    add: add them to the list
-         *    remove: remove them from the list
+         *    add: add them to the list of users
+         *    remove: remove them from the list of users
          */
         socket.on("updateUsers", (action, userName) => {
             switch (action) {
@@ -40,34 +51,49 @@ Vue.createApp({
             }
         });
 
-        // Receive message from server, and:
+        /** Receive message from server, and:
+         *    new: push that message to the chat history
+         *    update: use that message's ID to update a message in the chat history
+         *    delete: use that message's ID to delete a message from the chat history 
+         */
         socket.on("updateChat", (action, message) => {
+            console.log(this.history);
             switch (action) {
-                // push that message to the chat history
                 case "new":
                     this.history.push(message);
                     break;
-                // use that message's ID to update a message in the chat history
                 case "update":
                     this.history[this.history.findIndex(msg => msg.id == message.id)] = message;
                     break;
-                // use that message's ID to delete a message from the chat history 
                 case "delete":
                     this.history.splice(this.history.findIndex(msg => msg.id == message.id), 1);
                     break;
             }
         });
-
-        socket.emit("updateUsers", this.author);
     },
     methods: {
-        // Take text from an input box and send it to the server in order to:
+        /** Show/Hide modal to select username and room */
+        showModal() {
+            document.getElementById("userdata-modal").classList.toggle("show-modal");
+        },
+        /** Set username and room, and send them to the server */
+        setUserData(){
+            this.room = document.getElementById("room-set").value;
+            this.author = document.getElementById("username-set").value;
+            socket.emit("setUserData", this.room, this.author);
+
+            this.showModal();
+        },
+        /** Take text from an input box and send it to the server in order to:
+         *    new: push a new message to the chat history
+         *    update: update a message within the chat history
+         *    delete: delete a message from the chat history
+         */
         updateChat(action, message) {
             switch (action) {
-                // push a new message to the chat history
                 case "new":
                     if(this.text != "") {
-                        socket.emit("updateChat", "new",
+                        socket.emit("updateChat", this.room, "new",
                             {
                                 text: this.text,
                                 author: this.author
@@ -76,14 +102,13 @@ Vue.createApp({
                         this.text = "";
                     }
                     break;
-                // update a message within the chat history
                 case "update":
                     // This ensures only one edit textbox is open at a time
                     if (!message.editMessage) {
                         this.history.forEach(msg => msg.editMessage = false);
                         message.editMessage = true;
                     } else {
-                        socket.emit("updateChat", "update",
+                        socket.emit("updateChat", this.room, "update",
                             {
                                 id: message.id,
                                 text: this.editText
@@ -93,9 +118,8 @@ Vue.createApp({
                         this.editText = "";
                     }
                     break;
-                // Delete a message from the chat history
                 case "delete":
-                    socket.emit("updateChat", "delete", message);
+                    socket.emit("updateChat", this.room, "delete", message);
                     break;
             }
         },
@@ -112,13 +136,6 @@ Vue.createApp({
         check_for_mention(str) {
             if(str.includes('@' + this.author)) return true;
             return false;
-        },
-        setUsername(){
-            if(this.author === "guest")
-            {
-                this.author += '-' + this.makeid(5);
-            }
-            document.getElementById("usernameModal").classList.toggle("show-modal"); 
-        },
+        }
     }
 }).mount('#app');
