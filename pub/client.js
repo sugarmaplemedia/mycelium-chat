@@ -7,9 +7,16 @@ Vue.createApp({
         return {
             text: "", // Input text for submitting new messages
             editText: "", // Input text for editing messages
-            author: "aks", // The message author
+            author: "", // The message author
             history: [] // Chat history
         };
+    },
+    created() {
+        //generate random name if no login provided.
+        if(this.author === "")
+        {
+            this.author = "guest-" + this.makeid(5);
+        }
     },
     mounted() {
         // Initialize chat
@@ -75,6 +82,21 @@ Vue.createApp({
                     socket.emit("updateChat", "delete", message);
                     break;
             }
+        },
+        makeid(length) {
+            let result = '';
+            let ASCII_S = 48;  /*< ASCI START */
+            let ASCII_E = 122; /*< ASCI END */
+            for ( var i = 0; i < length; i++ ) {
+                result += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
+            }
+            return result;
+        },
+
+        check_for_mention(str)
+        {
+            if(str.includes('@' + this.author)) return true;
+            return false;
         }
     }
 }).mount('#app');
