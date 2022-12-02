@@ -9,6 +9,7 @@ Vue.createApp({
             editText: "", // Input text for editing messages
             author: "", // The message author
             history: [] // Chat history
+            users: [] // Users connected to chat
         };
     },
     created() {
@@ -22,6 +23,21 @@ Vue.createApp({
         // Initialize chat
         socket.on("init", (chat) => {
             this.history = chat;
+        });
+
+        /** Receive users from server, and:
+         *    add: add them to the list
+         *    remove: remove them from the list
+         */
+        socket.on("updateUsers", (action, userName) => {
+            switch (action) {
+                case "add":
+                    this.users.push(userName);
+                    break;
+                case "remove":
+                    this.users.splice(this.users.findIndex(user => user == userName), 1);
+                    break;
+            }
         });
 
         // Receive message from server, and:
@@ -42,7 +58,7 @@ Vue.createApp({
             }
         });
 
-        socket.emit("updateChat", "user", {status: 'joined', user: this.author});
+        socket.emit("updateUsers", this.author);
     },
     methods: {
         // Take text from an input box and send it to the server in order to:
@@ -93,10 +109,14 @@ Vue.createApp({
             return result;
         },
 
-        check_for_mention(str)
-        {
+        check_for_mention(str) {
             if(str.includes('@' + this.author)) return true;
             return false;
-        }
+        },
+        setUsername(){
+            console.log(this.author);
+            console.log(document.getElementById("usernameModal"));
+            document.getElementById("usernameModal").classList.toggle("show-modal"); 
+        },
     }
 }).mount('#app');
