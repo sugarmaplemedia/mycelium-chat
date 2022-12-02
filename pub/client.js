@@ -24,7 +24,9 @@ Vue.createApp({
             this.rooms = rooms;
         });
 
-        socket.on("testFunc", chat => console.log(typeof(chat)));
+        socket.on("setRoomHistory", roomHistory => {
+            this.history = roomHistory;
+        });
 
         /** Receive users from server, and:
          *    add: add them to the list of users
@@ -47,6 +49,7 @@ Vue.createApp({
          *    delete: use that message's ID to delete a message from the chat history 
          */
         socket.on("updateChat", (action, message) => {
+            console.log(this.history);
             switch (action) {
                 case "new":
                     this.history.push(message);

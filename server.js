@@ -21,7 +21,7 @@ const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history p
 
 /** GLOBALS */
 const usersList = new Map();
-const roomsList = ["global network", "the mushroom", "pretty fly (for a fungi)"];
+const roomsList = ["global", "the mushroom", "pretty fly (for a fungi)"];
 let chatHistory;
 if (!(chatHistory = load_chat_history())) {
     chatHistory = {};
@@ -64,7 +64,7 @@ process.on("SIGINT", () => {
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
-    socket.emit("init", chatHistory, roomsList);
+    socket.emit("init", chatHistory.global, roomsList);
 
     /** A user gives the server their room and username
      *    sends user to room
@@ -74,6 +74,7 @@ io.on("connection", (socket) => {
     socket.on("setUserData", (room, username) => {
         socket.join(room);
         usersList.set(socket.id, username);
+        socket.emit("setRoomHistory", chatHistory[room]);
         io.emit("updateUsers", "add", username);
     });
 
