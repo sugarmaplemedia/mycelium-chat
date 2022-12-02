@@ -14,28 +14,23 @@ html {
     background-color: blanchedalmond;
     border-radius: 5px;
     padding: 10px;
-    margin: 10px 0;
+    margin: 10px;
 }
 
 .navBar {
     background-color: rgb(255, 98, 98);
-    display: inline;
-}
-
-.textInput {
-
-    width: 70%;
+    padding: 15px;
+    position: sticky;
+    top: 0;
 }
 
 html,
 body {
     margin: 0;
     height: 100%;
-    overflow: hidden
-}
+    overflow: hidden;
+    background-color: rgb(238, 191, 135);
 
-.app {
-    background-color: bisque;
 }
 
 .message-meta {
@@ -53,6 +48,6 @@ body {
 .message-body {}
 
 #message-input {
-    width: 100%;
+    width: 70%;
     margin: 10px;
 }
