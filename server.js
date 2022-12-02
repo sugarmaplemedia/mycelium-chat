@@ -20,7 +20,7 @@ server.listen(PORT, () => {
 });
 
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
-const CHAT_HISTORY_PATH  = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
+const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
 /** GLOBALS */
 const chatHistory = load_chat_history();
@@ -31,7 +31,7 @@ const chatHistory = load_chat_history();
 function load_chat_history() {
     try {
         return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
-    } catch(err) {
+    } catch (err) {
         console.log(err.code);
     }
     return [];
@@ -39,7 +39,7 @@ function load_chat_history() {
 
 /** Save local chat history array to file */
 function save_chat_history() {
-    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, {type: "application/json;charset=utf-8"}), (err) => {
+    fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, { type: "application/json;charset=utf-8" }), (err) => {
         if (err) console.log(err);
         console.log('Successfuly written to the file!');
     });
@@ -69,7 +69,7 @@ io.on("connection", (socket) => {
                     timestamp: Date.now(),
                     id: base64id.generateId()
                 };
-            
+
                 chatHistory.push(newMessage);
                 io.emit("updateChat", "new", newMessage);
                 break;
