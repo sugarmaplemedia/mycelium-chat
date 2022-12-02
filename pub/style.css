@@ -21,20 +21,12 @@ body {
 
 }
 
-.message-meta {
-
-    display: flex;
-    justify-content: space-between;
-
-
-    /*
-    add hover effects
-    */
-}
-
 /*User List*/
 .userList {
-    float: right;
+
+    position: absolute;
+    top: 25%;
+    left: 85%;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
     width: 10%;
