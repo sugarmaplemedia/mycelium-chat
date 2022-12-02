@@ -3,9 +3,39 @@ html {
 }
 
 #chat-box {
-    height: 1000px;
-    width: 900px;
+    height: 80%;
+    width: 90%;
     overflow-y: scroll;
+
+}
+
+.container {
+    border: 2px solid rgb(220, 111, 111);
+    background-color: blanchedalmond;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.navBar {
+    background-color: rgb(255, 98, 98);
+    display: inline;
+}
+
+.textInput {
+
+    width: 70%;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden
+}
+
+.app {
+    background-color: bisque;
 }
 
 .message-meta {
@@ -14,8 +44,15 @@ html {
     justify-content: space-between;
 
     font-weight: bold;
+
+    /*
+    add hover effects
+    */
 }
+
+.message-body {}
 
 #message-input {
     width: 100%;
+    margin: 10px;
 }
