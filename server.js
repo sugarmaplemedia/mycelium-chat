@@ -78,10 +78,13 @@ io.on("connection", (socket) => {
         io.emit("updateUsers", "add", username);
     });
 
-    // Receive a message from the client, and:
+    /** Receive a message from the client, and:
+     *    new: record it to the server chat history, and push that message to all clients
+     *    update: update a message in the server chat history, and push that update to all clients
+     *    delete: delete that message from the server chat history and all client chat histories
+     */
     socket.on("updateChat", (room, action, message) => {
         switch (action) {
-            // Record it to the server chat history, and push that message to all clients
             case "new":
                 let newMessage = {
                     text: message.text,
@@ -94,13 +97,11 @@ io.on("connection", (socket) => {
                 chatHistory[room].push(newMessage);
                 io.to(room).emit("updateChat", "new", newMessage);
                 break;
-            // Update a message in the server chat history, and push that update to all clients
             case "update":
                 let updatedMessage = chatHistory[room][chatHistory[room].findIndex(msg => msg.id == message.id)];
                 updatedMessage.text = message.text;
                 io.to(room).emit("updateChat", "update", updatedMessage);
                 break;
-            // Delete that message from the server chat history and all client chat histories
             case "delete":
                 chatHistory[room].splice(chatHistory[room].findIndex(msg => msg.id == message.id), 1);
                 io.to(room).emit("updateChat", "delete", message);
@@ -109,9 +110,9 @@ io.on("connection", (socket) => {
     });
 
     /** A user disconnects from the server
-     *    Log their disconnection
-     *    Tell users the username who left
-     *    Remove user from mapped list
+     *    log their disconnection
+     *    tell users the username who left
+     *    remove user from mapped list
      */
     socket.on("disconnect", () => {
         console.log(socket.id + " disconnected");

@@ -18,12 +18,13 @@ Vue.createApp({
         };
     },
     mounted() {
-        /** Initialize chatroom */
+        /** Initialize global chatroom */
         socket.on("init", (chat, rooms) => {
             this.history = chat;
             this.rooms = rooms;
         });
 
+        /** Receive room chat history and switch over viewable messages */
         socket.on("setRoomHistory", roomHistory => {
             this.history = roomHistory;
         });
