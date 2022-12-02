@@ -13,6 +13,13 @@
     </head>
     <body id="app">
         <h1>Mycelium Chat</h1>
+        <div id="usernameModal" class="modal">
+            <div id="modalContent" class="modalContent">
+                <label for="userInput">Enter Username:</label>
+                <input type="text" id="userInput" v-model="author">
+                <button @click="setUsername">submit</button>
+            </div>
+        </div>
         <div id="user-list-box">
             <p></p>
         </div>

@@ -75,6 +75,9 @@ Vue.createApp({
                     socket.emit("updateChat", "delete", message);
                     break;
             }
-        }
+        },
+        setUsername(){
+                document.getElementById(usernameModal).classList.toggle("show-modal"); 
+        },
     }
 }).mount('#app');
