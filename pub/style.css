@@ -2,11 +2,85 @@ html {
     font-family: nunito;
 }
 
-#chat-box {
-    height: 80%;
-    width: 90%;
-    overflow-y: scroll;
+.navBar {
+    background-color: rgb(255, 98, 98);
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    z-index: 2;
 
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgb(211, 178, 128);
+
+}
+
+.message-meta {
+
+    display: flex;
+    justify-content: space-between;
+
+
+    /*
+    add hover effects
+    */
+}
+
+/*User List*/
+.userList {
+    float: right;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 10%;
+    z-index: 1;
+}
+
+/*Input*/
+.textInput {
+    width: 70%;
+    margin: 10px;
+    margin-right: 0;
+    height: 50px;
+    width: 600px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+
+
+}
+
+.send {
+    height: 60px;
+    width: 100px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    background-color: rgb(220, 111, 111);
+    opacity: .8;
+    border-radius: 5px;
+
+}
+
+button:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+
+/*Text Box*/
+#chat-box {
+    height: 70%;
+    width: 80%;
+    overflow-y: scroll;
+    background-color: rgb(238, 191, 135);
+    margin: 10px;
+    margin-top: 0;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgb(220, 111, 111);
+    border-top: none;
 }
 
 .container {
@@ -15,39 +89,28 @@ html {
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
+    width: 85%;
+    height: 180px;
+    opacity: 0.8;
+    display: grid;
 }
 
-.navBar {
-    background-color: rgb(255, 98, 98);
-    padding: 15px;
-    position: sticky;
-    top: 0;
+.container:hover {
+    opacity: 1;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
-html,
-body {
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-    background-color: rgb(238, 191, 135);
-
+.messageOptions {
+    text-align: right;
+    bottom: 0;
 }
 
-.message-meta {
-    width: 250px;
-    display: flex;
-    justify-content: space-between;
-
+.author {
+    font-size: 20px;
     font-weight: bold;
-
-    /*
-    add hover effects
-    */
 }
 
-.message-body {}
-
-#message-input {
-    width: 70%;
-    margin: 10px;
+.time {
+    text-align: right;
+    color: rgb(79, 79, 79);
 }

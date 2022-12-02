@@ -21,14 +21,14 @@
     </div>
     <div id="chat-box">
         <div v-for="data in history" class="container">
-            <div class="message-meta">
-                <p class="author">{{ data.author }}</p>
-                <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
-                <div v-if="data.author == author">
-                    <p @click="updateChat('update', data)">Edit</p>
-                    <p @click="updateChat('delete', data)">Delete</p>
-                </div>
+            <p class="author">{{ data.author }}</p>
+            <p class="time">{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                }} </p>
+            <div v-if="data.author == author" class="messageOptions">
+                <button @click="updateChat('update', data)">Edit✏️</button>
+                <button @click="updateChat('delete', data)"> Delete❌</button>
             </div>
+
             <div class="message-body">
                 <p> {{ data.text }} </p>
             </div>
@@ -36,8 +36,14 @@
         </div>
 
     </div>
-    <input class="textInput" id="message-input" v-model="text" placeholder="edit me"
+    <div class="userList">
+        <p> Tim</p>
+        <p> John</p>
+        <p> Norman</p>
+    </div>
+    <input class="textInput" id="message-input" v-model="text" placeholder="Message #general"
         @keydown.enter="updateChat('new', data)" />
+    <button class="send" @click=" updateChat('new', data)">Send</button>
 </body>
 
 </html>
