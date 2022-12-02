@@ -1,17 +1,17 @@
 /** Required Files */
-var express = require("express");
-var fs = require('fs');
-var http = require("http");
-var socketio = require("socket.io");
-var base64id = require('base64id'); /**< Base64ID setup (for generating message IDs) */
+const express = require("express");
+const fs = require('fs');
+const http = require("http");
+const socketio = require("socket.io");
+const base64id = require('base64id'); /**< Base64ID setup (for generating message IDs) */
 
 /** Express setup */
-var app = express();
+const app = express();
 app.use(express.static("pub"));
-var server = http.Server(app);
+const server = http.Server(app);
 
 /** Socket.io setup */
-var io = socketio(server);
+const io = socketio(server);
 
 /** Environment variables */
 const PORT = process.env.PORT || 8082; /**< default server port */

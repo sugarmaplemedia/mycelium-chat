@@ -127,7 +127,7 @@ Vue.createApp({
             let result = '';
             let ASCII_S = 48;  /*< ASCI START */
             let ASCII_E = 122; /*< ASCI END */
-            for ( var i = 0; i < length; i++ ) {
+            for ( let i = 0; i < length; i++ ) {
                 result += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
             }
             return result;
