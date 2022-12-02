@@ -1,21 +1,56 @@
+:root {
+    --bg-clr: #333033;
+    --prim-clr: #fce17c;
+    --scd-clr: #9dbdcf;
+    --tert-clr: #08080b;
+    --txt-clr: #eceeed;
+}
+
 html {
     font-family: nunito;
+    color: var(--txt-clr);
+    background-color: var(--bg-clr);
+}
+
+#app {
+    display: grid;
+    grid-template-rows: repeat(12, 1fr);
+}
+
+#app h1 {
+    grid-row: 1 / 2;
 }
 
 #chat-box {
-    height: 1000px;
     width: 900px;
+    grid-row: 2 / 12;
     overflow-y: scroll;
+
+    display: grid;
+    grid-template-rows: repeat(10, 1fr);
+}
+
+.message {
+    grid-row: 1fr;
+}
+
+.author {
+    color: var(--prim-clr);
 }
 
 .message-meta {
     width: 250px;
+
     display: flex;
-    justify-content: space-between;
+    gap: 12px;
 
     font-weight: bold;
 }
 
 #message-input {
-    width: 100%;
+    margin: 6px;
+    padding: 6px;
+    grid-row: 12 / 13;
+
+    border-radius: 120px;
 }
