@@ -26,8 +26,8 @@
         <div id="flex">
             <span id="flex-itemA">
                 <h3>Users Online:</h3>
-                <div id="user-list" v-for="user in users">
-                    <p>{{user}}</p></br>
+                <div id="user-list" v-for="(user,idx) in users">
+                    <p>{{users[idx].username}}</p></br>
                 </div>
             </span>
             <span id="flex-itemB">
