@@ -16,7 +16,7 @@
         <div id="userdata-modal" class="modal">
             <div id="userdata-content" class="modalContent">
                 <label for="username-set">Enter Username:</label>
-                <input id="username-set" type="text" />
+                <input id="username-set" type="text" @keydown.enter="setUserData"/>
                 <select id="room-set">
                     <option v-for="room in rooms" :value="room">{{room}}</option>
                 </select>
