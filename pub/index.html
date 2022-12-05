@@ -16,7 +16,7 @@
         <div id="userdata-modal" class="modal">
             <div id="userdata-content" class="modalContent">
                 <label for="username-set">Enter Username:</label>
-                <input id="username-set" type="text" />
+                <input id="username-set" type="text" @keydown.enter="setUserData"/>
                 <br>
                 <p id="no"></p>
                 <label for="room-set">Choose a chatroom to enter:</label>
@@ -33,8 +33,16 @@
             <p></p>
         </div>
         <div id="chat-box">
-            <div v-for="data in history">
+            <div v-for="(data, idx) in history">
                 <div class="message-meta">
+                    <div>
+                        <svg height="100" width="100">
+                            <filter :id="'picked-filter' + idx">
+                                <feColorMatrix type="matrix" :values="data.icon_color"/>
+                            </filter>
+                        </svg>
+                        <p :style="get_icon_color_filter(idx)">🍄</p>
+                    </div>
                     <p class="author">{{ data.author }}</p>
                     <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
                     <div v-if="data.author == author">

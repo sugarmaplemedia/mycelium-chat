@@ -1,6 +1,8 @@
 /** Socket.io client-side setup */
 const socket = io();
 
+const mushroom_icon_size = 20;
+
 /** Vue app setup */
 Vue.createApp({
     data() {
@@ -14,7 +16,8 @@ Vue.createApp({
 
             /** Messaging */
             text: "", // Input text for submitting new messages
-            editText: "" // Input text for editing messages
+            editText: "", // Input text for editing messages
+
         };
     },
     created() {
@@ -40,13 +43,13 @@ Vue.createApp({
          *    add: add them to the list of users
          *    remove: remove them from the list of users
          */
-        socket.on("updateUsers", (action, userName) => {
+        socket.on("updateUsers", (action, username, icon_color) => {
             switch (action) {
                 case "add":
-                    this.users.push(userName);
+                    this.users.push({username: username, icon_color: icon_color});
                     break;
                 case "remove":
-                    this.users.splice(this.users.findIndex(user => user == userName), 1);
+                    this.users.splice(this.users.findIndex(user => user.username == username), 1);
                     break;
             }
         });
@@ -57,7 +60,6 @@ Vue.createApp({
          *    delete: use that message's ID to delete a message from the chat history 
          */
         socket.on("updateChat", (action, message) => {
-            console.log(this.history);
             switch (action) {
                 case "new":
                     this.history.push(message);
@@ -138,7 +140,7 @@ Vue.createApp({
             let result = '';
             let ASCII_S = 48;  /*< ASCI START */
             let ASCII_E = 122; /*< ASCI END */
-            for ( var i = 0; i < length; i++ ) {
+            for ( let i = 0; i < length; i++ ) {
                 result += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
             }
             return result;
@@ -147,6 +149,18 @@ Vue.createApp({
         check_for_mention(str) {
             if(str.includes('@' + this.author)) return true;
             return false;
+        },
+
+        /*
+         * Each icon color filter has a unique id based on the index of the message being rendered
+         * we need to use this or it will only apply one filter all mushrooms.
+         */
+        get_icon_color_filter(id){
+            return {
+                '-webkit-filter': 'url(#picked-filter' + id + ')',
+                'filter': 'url(#picked-filter' + id + ')',
+                'font-size': mushroom_icon_size + 'px',
+            }
         }
-    }
+    },
 }).mount('#app');

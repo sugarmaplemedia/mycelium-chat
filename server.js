@@ -1,17 +1,17 @@
 /** Required Files */
-var express = require("express");
-var fs = require('fs');
-var http = require("http");
-var socketio = require("socket.io");
-var base64id = require('base64id'); /**< Base64ID setup (for generating message IDs) */
+const express = require("express");
+const fs = require('fs');
+const http = require("http");
+const socketio = require("socket.io");
+const base64id = require('base64id'); /**< Base64ID setup (for generating message IDs) */
 
 /** Express setup */
-var app = express();
+const app = express();
 app.use(express.static("pub"));
-var server = http.Server(app);
+const server = http.Server(app);
 
 /** Socket.io setup */
-var io = socketio(server);
+const io = socketio(server);
 
 /** Environment variables */
 const PORT = process.env.PORT || 8082; /**< default server port */
@@ -44,6 +44,7 @@ function load_chat_history() {
 
 /** Save local chat history array to file */
 function save_chat_history() {
+    /* @TODO we should ultimately persist users to the file system as well as users shouldn't lose their metadata simply because the server went down. */
     fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, { type: "application/json;charset=utf-8" }), (err) => {
         if (err) {
             console.log(err);
@@ -51,6 +52,32 @@ function save_chat_history() {
             console.log('Successfuly written to the file!');
         }
     });
+}
+
+/* R G B */
+const mushroom_color_min = 53;
+const mushroom_color_max = 177;
+
+function generate_mushroom_color() {
+    /**
+     * Basically I found a min and max that doesn't tear the icon up, which is what I used here.
+     *
+     * @NOTE the only issue I found is this doesn't play well with firefox so we should use Chrome during our presentation.
+     * Not totally sure why but we're time strapped so I don't really care either.
+     */
+    const r = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
+    const g = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
+    const b = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
+    const a = 1;
+
+    let matrix = `
+                ${r} 0 0 0 0
+                0 ${g} 0 0 0
+                0 0 0 ${b} 0
+                0 0 0 ${a} 0
+            `;
+
+    return matrix;
 }
 
 /* PROCESS EVENTS */
@@ -77,9 +104,24 @@ io.on("connection", (socket) => {
      */
     socket.on("setUserData", (room, username) => {
         socket.join(room);
-        usersList.set(socket.id, username);
+        let user_color = generate_mushroom_color();
+        /**
+         * So pretty much the idea is usernames are unique (they should be). With this they should be the key in the usersList.
+         * This allows the user to "relogin" without losing any of their ability to edit or delete their previous messages
+         * Also this allows the user icon color to persist along with any other metadata
+         */
+        let userExist = usersList.get(username);
+        if(userExist !== undefined)
+        {
+            userExist.socket = socket.id;
+        }
+        else
+        {
+            /* icon color should be stored along with any other metadata we deem fit for the user */
+            usersList.set(username, {socket: socket.id, icon_color: user_color});
+        }
         socket.emit("setRoomHistory", chatHistory[room]);
-        io.emit("updateUsers", "add", username);
+        io.emit("updateUsers", "add", username, user_color);
     });
 
     /** Receive a message from the client, and:
@@ -94,6 +136,7 @@ io.on("connection", (socket) => {
                     text: message.text,
                     editMessage: false,
                     author: message.author,
+                    icon_color: usersList.get(message.author).icon_color, /**< Fetch user icon color */
                     timestamp: Date.now(),
                     id: base64id.generateId()
                 };
