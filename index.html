@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Base</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <script defer src="client.js" type="text/javascript"></script>
+</head>
+
+<body id="app">
+    <!--Navigation-->
+    <div class="navBar">
+        <h1>
+            Mycelium Chat - {{room}} <button @click="showModal" class="change">Change Room</button>
+            <!--Drop Down Menu?-->
+        </h1>
+    </div>
+
+
+    </div>
+
+    <!--MODAL-->
+    <div id="userdata-modal" class="modal">
+        <div id="userdata-content" class="modalContent">
+            <label for="username-set">Enter Username:</label>
+            <input id="username-set" type="text" @keydown.enter="setUserData" />
+            <div class="center">
+                <select id="room-set">
+                    <option v-for="room in rooms" :value="room">{{room}}</option>
+                </select>
+                <br>
+                <button @click="setUserData">submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!--User List-->
+    <div id="user-list-box" class="userList">
+        <p>🍄Tom</p>
+        <p>🍄Bob</p>
+        <p>🍄Fred</p>
+
+
+    </div>
+    <!--Chat Box-->
+    <div id="chat-box">
+        <div v-for="(data, idx) in history">
+            <div class="container">
+                <div>
+                    <svg height="100" width="100">
+                        <filter :id="'picked-filter' + idx">
+                            <feColorMatrix type="matrix" :values="data.icon_color" />
+                        </filter>
+                    </svg>
+                    <p :style="get_icon_color_filter(idx)" class="author">🍄 {{ data.author }}</p>
+                </div>
+
+                <p class="time">{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit',
+                    minute:'2-digit'}) }} </p>
+                <div v-if="data.author == author" class="messageOptions">
+                    <button @click="updateChat('update', data)">Edit</button>
+                    <button @click="updateChat('delete', data)">Delete</button>
+                </div>
+
+                <div class="center">
+                    <!-- This should be more creative something with a background color or something -->
+                    <strong v-if="check_for_mention(data.text)">
+                        <p> {{ data.text }} </p>
+                    </strong>
+                    <p v-else> {{ data.text }} </p>
+                </div>
+            </div>
+            <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
+        </div>
+    </div>
+    <!--Input New Message-->
+    <input id="message-input" class="textInput" v-model="text" placeholder="Spore new thoughts..."
+        @keydown.enter="updateChat('new', data)" />
+    <button class="send" @click="updateChat('new', data)">Send</button>
+</body>
+
+</html>
