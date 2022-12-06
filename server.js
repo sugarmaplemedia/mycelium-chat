@@ -95,7 +95,7 @@ process.on('exit', (code) => {
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
-    socket.emit("init", chatHistory.global, roomsList);
+    socket.emit("init", chatHistory.global, usersList, roomsList);
 
     /** A user gives the server their room and username
      *    sends user to room

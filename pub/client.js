@@ -10,7 +10,7 @@ Vue.createApp({
             /** Metadata */
             author: "guest", // Client username
             room: "", // Room the client is in
-            users: [], // Users connected to chat
+            users: null, // Users connected to chat
             rooms: [], // Available rooms to join
             history: [], // Chat history
 
@@ -29,9 +29,11 @@ Vue.createApp({
     },
     mounted() {
         /** Initialize global chatroom */
-        socket.on("init", (chat, rooms) => {
+        socket.on("init", (chat, users, rooms) => {
             this.history = chat;
             this.rooms = rooms;
+            this.users = users;
+            console.log(this.users.entries().);
         });
 
         /** Receive room chat history and switch over viewable messages */
