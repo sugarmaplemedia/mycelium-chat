@@ -50,7 +50,8 @@ Vue.createApp({
                     this.users.push([username, {icon_color: icon_color}]);
                     break;
                 case "remove":
-                    this.users.splice(this.users.findIndex(user => user.username == username), 1);
+                    console.log(username + " has left");
+                    this.users.splice(this.users.findIndex(user => user[0] == username), 1);
                     break;
             }
         });

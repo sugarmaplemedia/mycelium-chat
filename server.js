@@ -110,18 +110,16 @@ io.on("connection", (socket) => {
     socket.on("setUserData", (room, username) => {
         socket.join(room);
         let user_color = generate_mushroom_color();
+        
         /**
          * So pretty much the idea is usernames are unique (they should be). With this they should be the key in the usersList.
          * This allows the user to "relogin" without losing any of their ability to edit or delete their previous messages
          * Also this allows the user icon color to persist along with any other metadata
          */
         let userExist = usersList.get(username);
-        if(userExist !== undefined)
-        {
+        if(userExist !== undefined) {
             userExist.socket = socket.id;
-        }
-        else
-        {
+        } else {
             /* icon color should be stored along with any other metadata we deem fit for the user */
             usersList.set(username, {socket: socket.id, icon_color: user_color});
         }
@@ -167,8 +165,15 @@ io.on("connection", (socket) => {
      *    remove user from mapped list
      */
     socket.on("disconnect", () => {
-        console.log(socket.id + " disconnected");
-        io.emit("updateUsers", "remove", usersList.get(socket.id));
-        usersList.delete(socket.id);
+        let userToRemoveIterator = usersList.entries();
+        let userToRemove;
+        let userRemoved = false;
+        while (!userRemoved && (userToRemove = userToRemoveIterator.next().value) != undefined) {
+            if (userToRemove[1].socket == socket.id) {
+                io.emit("updateUsers", "remove", userToRemove[0], null);
+                usersList.delete(userToRemove[0]);
+                userRemoved = true;
+            }
+        }
     });
 });
