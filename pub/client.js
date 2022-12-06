@@ -19,8 +19,7 @@ Vue.createApp({
     },
     created() {
         //generate random name if no login provided.
-        if(this.author === "")
-        {
+        if (this.author === "") {
             this.author = "guest-" + this.makeid(5);
         }
     },
@@ -77,13 +76,28 @@ Vue.createApp({
             document.getElementById("userdata-modal").classList.toggle("show-modal");
         },
         /** Set username and room, and send them to the server */
-        setUserData(){
+        setUserData() {
             this.room = document.getElementById("room-set").value;
             this.author = document.getElementById("username-set").value;
             socket.emit("setUserData", this.room, this.author);
 
             this.showModal();
         },
+        /** validate and create new chatrooms
+         *  Validate: check all room of rooms to see if the name is the same as the new room
+         *  Create: use a .push(name) on rooms array
+         *   */
+
+        createChatroom(name) {
+            for (room of rooms) {
+                if (room == name) {
+                    return console.log("Error: " + room + " is already taken, try a different name");
+                }
+            }
+            rooms.push(name);
+            socket.emit("createRoom", name);
+        },
+
         /** Take text from an input box and send it to the server in order to:
          *    new: push a new message to the chat history
          *    update: update a message within the chat history
@@ -92,7 +106,7 @@ Vue.createApp({
         updateChat(action, message) {
             switch (action) {
                 case "new":
-                    if(this.text != "") {
+                    if (this.text != "") {
                         socket.emit("updateChat", this.room, "new",
                             {
                                 text: this.text,
@@ -127,14 +141,14 @@ Vue.createApp({
             let result = '';
             let ASCII_S = 48;  /*< ASCI START */
             let ASCII_E = 122; /*< ASCI END */
-            for ( let i = 0; i < length; i++ ) {
+            for (let i = 0; i < length; i++) {
                 result += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
             }
             return result;
         },
 
         check_for_mention(str) {
-            if(str.includes('@' + this.author)) return true;
+            if (str.includes('@' + this.author)) return true;
             return false;
         }
     }

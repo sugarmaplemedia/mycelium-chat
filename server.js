@@ -70,6 +70,17 @@ io.on("connection", (socket) => {
     console.log("user connected " + socket.id);
     socket.emit("init", chatHistory.global, roomsList);
 
+    /**createRoom 
+     * push room name to roomList
+     * chatHistory[name] = [] 
+    */
+    socket.on("createRoom", (name) => {
+        roomsList.push(name);
+        chatHistory[name] = [];
+        socket.emit("setRoomHistory", chatHistory[name]);
+
+    });
+
     /** A user gives the server their room and username
      *    sends user to room
      *    adds user ID and name to mapped list
