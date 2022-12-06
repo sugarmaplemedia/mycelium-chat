@@ -28,6 +28,8 @@ body {
     background-color: #FA7070;
     height: 60px;
     width: 140px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+
 }
 
 /*Room Menu*/
@@ -163,8 +165,10 @@ svg {
     color: #F8EDE3;
     background-color: #A1C298;
     padding: 10px;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-left: 35px;
+    padding-right: 35px;
+
 
     border: 2px#53704b solid;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
