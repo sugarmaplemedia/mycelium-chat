@@ -28,6 +28,9 @@ Vue.createApp({
         }
     },
     mounted() {
+        /** Auto-select username input on mount */
+        document.getElementById("username-set").select();
+
         /** Initialize global chatroom */
         socket.on("init", (chat, users, rooms) => {
             this.history = chat;
@@ -65,6 +68,11 @@ Vue.createApp({
             switch (action) {
                 case "new":
                     this.history.push(message);
+                    if (message.author == this.author) {
+                        setTimeout(() => {
+                            document.getElementById("chat-message-box").scrollTop = document.getElementById("chat-message-box").scrollHeight;
+                        }, 100);
+                    }
                     break;
                 case "update":
                     this.history[this.history.findIndex(msg => msg.id == message.id)] = message;
@@ -74,19 +82,23 @@ Vue.createApp({
                     break;
             }
         });
+
     },
     methods: {
-        /** Show/Hide modal to select username and room */
-        showModal() {
-            document.getElementById("userdata-modal").classList.toggle("show-modal");
+        /** Add username to text query */
+        addToText(username) {
+            this.text += `@${username} `;
+            document.getElementById("message-input").select();
         },
+
         /** Set username and room, and send them to the server */
         setUserData(){
             this.room = document.getElementById("room-set").value;
             this.author = document.getElementById("username-set").value;
             socket.emit("setUserData", this.room, this.author);
 
-            this.showModal();
+            document.getElementById("userdata-modal").classList.toggle("hideModal");
+            document.getElementById("message-input").select();
         },
         /** Take text from an input box and send it to the server in order to:
          *    new: push a new message to the chat history

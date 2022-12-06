@@ -2,70 +2,92 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Base</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Mycelium Chat - The World's First Chat Client</title>
         <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 		<script src="/socket.io/socket.io.js" type="text/javascript"></script>
         <link rel="stylesheet" href="style.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"> 
 		<script defer src="client.js" type="text/javascript"></script>
     </head>
     <body id="app">
-        <h1 @click="showModal">Mycelium Chat - {{room}}</h1>
-            <div id="userdata-modal" class="modal">
-                <div id="userdata-content" class="modalContent">
-                    <label for="username-set">Enter Username:</label>
-                    <input id="username-set" type="text" @keydown.enter="setUserData"/>
-                    <select id="room-set">
-                        <option v-for="room in rooms" :value="room">{{room}}</option>
-                    </select>
-                    <button @click="setUserData">submit</button>
+        <section id="userdata-modal">
+            <div id="userdata-content">
+                <div id="userdata-username">
+                    <label for="username-set">Enter Username:</label><br />
+                    <input id="username-set" type="text" @keydown.enter="setUserData" autofocus/>
                 </div>
+                <select id="room-set">
+                    <option v-for="room in rooms" :value="room">{{room}}</option>
+                </select>
+                <button @click="setUserData">submit</button>
             </div>
-        <div id="flex">
-            <span id="flex-itemA">
-                <h3>Users Online:</h3>
-                <div id="user-list" v-for="(user,idx) in users">
-                    <p>{{users[idx][0]}}</p></br>
+        </section>
+        <div id="app-content">
+            <section id="title-box">
+                <h1>🍄 mycelium chat</h1>
+            </section>
+            <section id="userlist-box">
+                <div id="userlist-title">
+                    <h2>users online</h3>
                 </div>
-            </span>
-            <span id="flex-itemB">
-                    
-                <!--<div id="user-list-box">
-                    <p></p>
-                </div>-->
-                <div id="chat-box">
-                    <div v-for="(data, idx) in history">
-                        <div class="message-meta">
-                            <div>
+                <div id="userlist">
+                    <div class="userlist-user" v-for="(user,idx) in users" @click="addToText(users[idx][0])">
+                        <p>
+                            <span class="mushroom">
+                                <svg height="100" width="100">
+                                    <filter :id="'picked-filter' + idx">
+                                        <feColorMatrix type="matrix" :values="users[idx][1].icon_color"/>
+                                    </filter>
+                                </svg>
+                                <span :style="get_icon_color_filter(idx)">🍄</span>
+                            </span>
+                            {{users[idx][0]}}
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <section id="chat-box">
+                <div id="chat-title">
+                    <h2>{{room}} chat</h3>
+                </div>
+                <div id="chat-message-box">
+                    <div class="chat-message" v-for="(data, idx) in history">
+                        <div class="chat-message-meta">
+                            <span v-if="data.author == author">
+                                <img class="update" @click="updateChat('update', data)" src="./icons/delete.svg" alt="update" title="update" />
+                                <img class="delete" @click="updateChat('delete', data)" src="./icons/update.svg" alt="delete" title="delete" />
+                            </span>
+                            <span class="time">{{new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}}</span>
+                            <span class="mushroom">
                                 <svg height="100" width="100">
                                     <filter :id="'picked-filter' + idx">
                                         <feColorMatrix type="matrix" :values="data.icon_color"/>
                                     </filter>
                                 </svg>
-                                <p :style="get_icon_color_filter(idx)">🍄</p>
-                            </div>
-                            <p class="author">{{ data.author }}</p>
-                            <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
-                            <div v-if="data.author == author">
-                                <p @click="updateChat('update', data)">Edit</p>
-                                <p @click="updateChat('delete', data)">Delete</p>
-                            </div>
+                                <span :style="get_icon_color_filter(idx)">🍄</span>
+                            </span>
+                            <span class="author">{{data.author}}:</span>
                         </div>
-                        <div class="message-body">
-                            <!-- This should be more creative something with a background color or something -->
-                            <strong v-if="check_for_mention(data.text)">
-                                <p> {{ data.text }} </p>
-                            </strong>
-                            <p v-else> {{ data.text }} </p>
+                        <div class="chat-message-body">
+                            <p v-if="check_for_mention(data.text)">
+                                <strong>{{data.text}}</strong>
+                            </p>
+                            <p v-else>
+                                {{data.text}}
+                            </p>
                         </div>
-                        <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
+                        <input class="update-input" v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
                     </div>
-                    <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
                 </div>
-            </span>
+            </section>
+            <section id="message-box">
+                <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
+                <button @click="updateChat('new', data)">send</button>
+            </section>
         </div>
-           
     </body>
 </html>
