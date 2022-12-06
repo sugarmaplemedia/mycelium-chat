@@ -27,6 +27,8 @@
             <p></p>
         </div>
         <div id="chat-box">
+            <p>change room:</p>
+            <input id="room-add" v-model="newRoomName" type="text" @keydown.enter="createChatroom(newRoomName)">
             <div v-for="(data, idx) in history">
                 <div class="message-meta">
                     <div>

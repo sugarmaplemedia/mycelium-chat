@@ -17,7 +17,7 @@ Vue.createApp({
             /** Messaging */
             text: "", // Input text for submitting new messages
             editText: "", // Input text for editing messages
-
+            newRoomName: "", //Input text for creating new room
         };
     },
     created() {
@@ -91,13 +91,15 @@ Vue.createApp({
          *   */
 
         createChatroom(name) {
-            for (room of rooms) {
+            for (room in this.rooms) {
                 if (room == name) {
                     return console.log("Error: " + room + " is already taken, try a different name");
                 }
             }
-            rooms.push(name);
+            this.rooms.push(name);
             socket.emit("createRoom", name);
+            this.room = name;
+            console.log(name);
         },
 
         /** Take text from an input box and send it to the server in order to:
