@@ -46,6 +46,7 @@ body {
 
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
     border: 3px solid #53704b;
+    border-radius: 5px;
 
     /*Allows auto scroll down on new input*/
     display: flex;
@@ -91,6 +92,9 @@ body {
     height: 50px;
     width: 800px;
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    border: 2px solid #53704b;
+
+    border-radius: 5px;
 }
 
 .send {
@@ -117,7 +121,6 @@ button:hover {
 /*Modal*/
 .modal {
     padding: 15px;
-    background-color: #FA7070;
 }
 
 #userdata-modal {
@@ -131,6 +134,7 @@ button:hover {
     transform: scale(1.1);
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
     z-index: 5;
+
 }
 
 #userdata-content {
@@ -170,5 +174,7 @@ svg {
 
 
     border: 2px#53704b solid;
+    border-radius: 5px;
+
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
