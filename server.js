@@ -94,8 +94,13 @@ process.on('exit', (code) => {
 
 /* WEBSOCKET FUNCTIONS */
 io.on("connection", (socket) => {
-    console.log("user connected " + socket.id);
-    socket.emit("init", chatHistory.global, usersList, roomsList);
+    let usersForClientIterator = usersList.entries();
+    let usersForClient = [];
+    let thisUser;
+    while ((thisUser = usersForClientIterator.next().value) != undefined) {
+        usersForClient.push(thisUser);
+    }
+    socket.emit("init", chatHistory.global, usersForClient, roomsList);
 
     /** A user gives the server their room and username
      *    sends user to room
