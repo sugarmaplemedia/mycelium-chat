@@ -45,14 +45,17 @@
                     </div>
                 </div>
             </div>
+            <!-- ISSUE: data var is being accessed outside of v-for loop, breaking the UI
             <div class="message-body">
-                <!-- This should be more creative something with a background color or something -->
+                This should be more creative something with a background color or something
                 <strong v-if="check_for_mention(data.text)">
                     <p> {{ data.text }} </p>
                 </strong>
                 <p v-else> {{ data.text }} </p>
             </div>
+            
             <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
+            -->
         </div>
         <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
     </div>
