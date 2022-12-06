@@ -8,6 +8,7 @@ html {
     overflow-y: scroll;
 }
 
+
 .message-meta {
     width: 250px;
     display: flex;
@@ -50,4 +51,7 @@ html {
     transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
 }
 
-
+svg {
+    position: absolute;
+    height: 0;
+}
