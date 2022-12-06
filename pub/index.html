@@ -14,7 +14,7 @@
     <body id="app">
         <h1>Mycelium Chat - {{room}}</h1>
         <select id="room-set">
-            <option v-for="room in rooms" :value="room">{{room}}</option>
+            <option id="roomChanger" v-for="room in rooms" :value="room" @click="setRoom">{{room}} </option>
         </select>
         <div id="userdata-modal" class="modal">
             <div id="userdata-content" class="modalContent">

@@ -87,6 +87,11 @@ Vue.createApp({
 
             this.showModal();
         },
+        setRoom() {
+            socket.emit("setRoom", this.room, document.getElementById("roomChanger").value);
+            this.room = document.getElementById("roomChanger").value;
+            console.log("ran fuction");
+        },
         /** validate and create new chatrooms
          *  Validate: check all room of rooms to see if the name is the same as the new room
          *  Create: use a .push(name) on rooms array

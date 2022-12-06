@@ -137,6 +137,11 @@ io.on("connection", (socket) => {
         socket.emit("setRoomHistory", chatHistory[room]);
         io.emit("updateUsers", "add", username, user_color);
     });
+    socket.on("setRoom", (room, oldRoom) => {
+        socket.leave(oldRoom);
+        socket.join(room);
+        socket.emit("setRoomHistory", chatHistory[room]);
+    });
 
     /** Receive a message from the client, and:
      *    new: record it to the server chat history, and push that message to all clients
