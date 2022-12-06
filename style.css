@@ -1,0 +1,170 @@
+/*Misc*/
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #FA7070;
+    font-family: nunito;
+
+}
+
+.center {
+    text-align: center;
+}
+
+/*Navigation Bar*/
+.navBar {
+    background-color: #A1C298;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    color: #F8EDE3;
+}
+
+.change {
+    float: right;
+    background-color: #FA7070;
+    height: 60px;
+    width: 140px;
+}
+
+/*Room Menu*/
+
+
+/*Chat Box*/
+#chat-box {
+    margin: 10px;
+    height: 70%;
+    width: 75%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #C6EBC5;
+
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    border: 3px solid #53704b;
+
+    /*Allows auto scroll down on new input*/
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+/*Messages*/
+.container {
+    border: 2px solid #53704b;
+    background-color: #FBF2CF;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 4px;
+    margin-right: 0;
+    width: 95%;
+    height: 180px;
+    opacity: 0.8;
+    display: grid;
+}
+
+.messageOptions {
+    text-align: right;
+    bottom: 0;
+
+}
+
+.container:hover {
+    opacity: 1;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.time {
+    text-align: right;
+    color: rgb(79, 79, 79);
+}
+
+/* Input box */
+.textInput {
+    width: 70%;
+    margin: 10px;
+    margin-right: 0;
+    margin-left: 100px;
+    height: 50px;
+    width: 800px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.send {
+    height: 60px;
+    width: 100px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    background-color: #A1C298;
+}
+
+button {
+    background-color: #A1C298;
+    color: #F8EDE3;
+    border-radius: 5px;
+    margin: 5px;
+    border: 2px solid #53704b;
+}
+
+button:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/*Modal*/
+.modal {
+    padding: 15px;
+    background-color: #FA7070;
+}
+
+#userdata-modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(87, 87, 205, 0.3);
+    opacity: 1;
+    transform: scale(1.1);
+    transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
+    z-index: 5;
+}
+
+#userdata-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 1rem 1.5rem;
+    width: 24rem;
+    border-radius: 0.5rem;
+}
+
+.show-modal {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.0);
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+}
+
+svg {
+    position: absolute;
+    height: 0;
+}
+
+/*User List*/
+.userList {
+    position: absolute;
+    left: 85%;
+    top: 20%;
+    z-index: 3;
+    color: #F8EDE3;
+    background-color: #A1C298;
+    padding: 10px;
+    padding-left: 25px;
+    padding-right: 25px;
+
+    border: 2px#53704b solid;
+}
