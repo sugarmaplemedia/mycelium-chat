@@ -13,47 +13,59 @@
     </head>
     <body id="app">
         <h1 @click="showModal">Mycelium Chat - {{room}}</h1>
-        <div id="userdata-modal" class="modal">
-            <div id="userdata-content" class="modalContent">
-                <label for="username-set">Enter Username:</label>
-                <input id="username-set" type="text" @keydown.enter="setUserData"/>
-                <select id="room-set">
-                    <option v-for="room in rooms" :value="room">{{room}}</option>
-                </select>
-                <button @click="setUserData">submit</button>
-            </div>
-        </div>
-        <div id="user-list-box">
-            <p></p>
-        </div>
-        <div id="chat-box">
-            <div v-for="(data, idx) in history">
-                <div class="message-meta">
-                    <div>
-                        <svg height="100" width="100">
-                            <filter :id="'picked-filter' + idx">
-                                <feColorMatrix type="matrix" :values="data.icon_color"/>
-                            </filter>
-                        </svg>
-                        <p :style="get_icon_color_filter(idx)">🍄</p>
-                    </div>
-                    <p class="author">{{ data.author }}</p>
-                    <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
-                    <div v-if="data.author == author">
-                        <p @click="updateChat('update', data)">Edit</p>
-                        <p @click="updateChat('delete', data)">Delete</p>
-                    </div>
+            <div id="userdata-modal" class="modal">
+                <div id="userdata-content" class="modalContent">
+                    <label for="username-set">Enter Username:</label>
+                    <input id="username-set" type="text" @keydown.enter="setUserData"/>
+                    <select id="room-set">
+                        <option v-for="room in rooms" :value="room">{{room}}</option>
+                    </select>
+                    <button @click="setUserData">submit</button>
                 </div>
-                <div class="message-body">
-                    <!-- This should be more creative something with a background color or something -->
-                    <strong v-if="check_for_mention(data.text)">
-                        <p> {{ data.text }} </p>
-                    </strong>
-                    <p v-else> {{ data.text }} </p>
-                </div>
-                <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
             </div>
-            <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
+        <div id="flex">
+            <span id="flex-itemA">
+                <h3>Users Online:</h3>
+                <div id="user-list" v-for="(user,idx) in users">
+                    <p>{{users[idx][0]}}</p></br>
+                </div>
+            </span>
+            <span id="flex-itemB">
+                    
+                <!--<div id="user-list-box">
+                    <p></p>
+                </div>-->
+                <div id="chat-box">
+                    <div v-for="(data, idx) in history">
+                        <div class="message-meta">
+                            <div>
+                                <svg height="100" width="100">
+                                    <filter :id="'picked-filter' + idx">
+                                        <feColorMatrix type="matrix" :values="data.icon_color"/>
+                                    </filter>
+                                </svg>
+                                <p :style="get_icon_color_filter(idx)">🍄</p>
+                            </div>
+                            <p class="author">{{ data.author }}</p>
+                            <p>{{ new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }} </p>
+                            <div v-if="data.author == author">
+                                <p @click="updateChat('update', data)">Edit</p>
+                                <p @click="updateChat('delete', data)">Delete</p>
+                            </div>
+                        </div>
+                        <div class="message-body">
+                            <!-- This should be more creative something with a background color or something -->
+                            <strong v-if="check_for_mention(data.text)">
+                                <p> {{ data.text }} </p>
+                            </strong>
+                            <p v-else> {{ data.text }} </p>
+                        </div>
+                        <input v-if="data.editMessage" v-model="editText" @keydown.enter="updateChat('update', data)" />
+                    </div>
+                    <input id="message-input" v-model="text" placeholder="edit me" @keydown.enter="updateChat('new', data)" />
+                </div>
+            </span>
         </div>
+           
     </body>
 </html>

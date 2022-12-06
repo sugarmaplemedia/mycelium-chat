@@ -29,9 +29,10 @@ Vue.createApp({
     },
     mounted() {
         /** Initialize global chatroom */
-        socket.on("init", (chat, rooms) => {
+        socket.on("init", (chat, users, rooms) => {
             this.history = chat;
             this.rooms = rooms;
+            this.users = users;
         });
 
         /** Receive room chat history and switch over viewable messages */
@@ -46,10 +47,11 @@ Vue.createApp({
         socket.on("updateUsers", (action, username, icon_color) => {
             switch (action) {
                 case "add":
-                    this.users.push({username: username, icon_color: icon_color});
+                    this.users.push([username, {icon_color: icon_color}]);
                     break;
                 case "remove":
-                    this.users.splice(this.users.findIndex(user => user.username == username), 1);
+                    console.log(username + " has left");
+                    this.users.splice(this.users.findIndex(user => user[0] == username), 1);
                     break;
             }
         });
