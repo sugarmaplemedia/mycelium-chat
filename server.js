@@ -19,20 +19,21 @@ server.listen(PORT, () => console.log(`server is listening on port ${PORT}`));
 const CHAT_HISTORY_FNAME = "chat_history.json";       /**< default chat history file name */
 const CHAT_HISTORY_PATH = "./" + CHAT_HISTORY_FNAME; /**< default chat history path */
 
-/** GLOBALS */
+/** Global Variables */
 const usersList = new Map();
 const roomsList = ["global", "the mushroom", "pretty fly (for a fungi)", "in the dirt"];
 let chatHistory;
+
+
+/* SERVER FUNCTIONS */
+
+/** Load designated chat history file from file system */
 if (!(chatHistory = load_chat_history())) {
     chatHistory = {};
     for (room of roomsList) {
         chatHistory[room] = [];
     }
 }
-
-/* SERVER FUNCTIONS */
-
-/** Load designated chat history file from file system */
 function load_chat_history() {
     try {
         return JSON.parse(fs.readFileSync(CHAT_HISTORY_PATH));
@@ -44,7 +45,6 @@ function load_chat_history() {
 
 /** Save local chat history array to file */
 function save_chat_history() {
-    /* @TODO we should ultimately persist users to the file system as well as users shouldn't lose their metadata simply because the server went down. */
     fs.writeFileSync(CHAT_HISTORY_FNAME, JSON.stringify(chatHistory, { type: "application/json;charset=utf-8" }), (err) => {
         if (err) {
             console.log(err);
@@ -54,20 +54,13 @@ function save_chat_history() {
     });
 }
 
-/* R G B */
-const mushroom_color_min = 53;
-const mushroom_color_max = 177;
-
-function generate_mushroom_color() {
-    /**
-     * Basically I found a min and max that doesn't tear the icon up, which is what I used here.
-     *
-     * @NOTE the only issue I found is this doesn't play well with firefox so we should use Chrome during our presentation.
-     * Not totally sure why but we're time strapped so I don't really care either.
-     */
-    const r = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
-    const g = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
-    const b = ((Math.random() * (mushroom_color_max - mushroom_color_min + 1) + mushroom_color_min) / mushroom_color_max);
+/* R G B  M U S H R O O M S*/
+const mushroomColorMin = 53;
+const mushroomColorMax = 177;
+function generateMushroomColor() {
+    const r = ((Math.random() * (mushroomColorMax - mushroomColorMin + 1) + mushroomColorMin) / mushroomColorMax);
+    const g = ((Math.random() * (mushroomColorMax - mushroomColorMin + 1) + mushroomColorMin) / mushroomColorMax);
+    const b = ((Math.random() * (mushroomColorMax - mushroomColorMin + 1) + mushroomColorMin) / mushroomColorMax);
     const a = 1;
 
     let matrix = `
@@ -80,66 +73,57 @@ function generate_mushroom_color() {
     return matrix;
 }
 
+
 /* PROCESS EVENTS */
+
+/** On interrupt, save the chat history */
 process.on("SIGINT", () => {
     save_chat_history();
     console.log(`Process ${process.pid} has been interrupted`);
     process.exit(0);
 });
 
+/** On shutdown, save the chat history */
 process.on('exit', (code) => {
     save_chat_history();
     console.log('Process exit event with code: ', code);
 });
 
+
 /* WEBSOCKET FUNCTIONS */
+
 io.on("connection", (socket) => {
+    /** Iterate through user map and send client all current users */
     let usersForClientIterator = usersList.entries();
     let usersForClient = [];
     let thisUser;
     while ((thisUser = usersForClientIterator.next().value) != undefined) {
         usersForClient.push(thisUser);
     }
+
+    /** Send client chat history for global room, along with users and current rooms */
     socket.emit("init", chatHistory.global, usersForClient, roomsList);
 
-    /** A user gives the server their room and username
-     *    sends user to room
-     *    adds user ID and name to mapped list
-     *    sends new user data to clients
-     */
-    socket.on("setUserData", (room, username) => {
-        socket.join(room);
-        let user_color = generate_mushroom_color();
-        
-        /**
-         * So pretty much the idea is usernames are unique (they should be). With this they should be the key in the usersList.
-         * This allows the user to "relogin" without losing any of their ability to edit or delete their previous messages
-         * Also this allows the user icon color to persist along with any other metadata
-         */
-        let userExist = usersList.get(username);
-        if(userExist !== undefined) {
-            userExist.socket = socket.id;
-        } else {
-            /* icon color should be stored along with any other metadata we deem fit for the user */
-            usersList.set(username, {socket: socket.id, icon_color: user_color});
-        }
-        socket.emit("setRoomHistory", chatHistory[room]);
-        io.emit("updateUsers", "add", username, user_color);
+
+    /** Receive room from client and set them in that room */
+    socket.on("setRoom", roomName => {
+        socket.join(roomName);
+        socket.emit("setRoomHistory", chatHistory[roomName], roomName);
     });
 
-    /** Receive a message from the client, and:
+     /** Receive a message from the client, and:
      *    new: record it to the server chat history, and push that message to all clients
      *    update: update a message in the server chat history, and push that update to all clients
      *    delete: delete that message from the server chat history and all client chat histories
      */
-    socket.on("updateChat", (room, action, message) => {
+      socket.on("updateChat", (room, action, message) => {
         switch (action) {
             case "new":
                 let newMessage = {
                     text: message.text,
                     editMessage: false,
                     author: message.author,
-                    icon_color: usersList.get(message.author).icon_color, /**< Fetch user icon color */
+                    iconColor: usersList.get(message.author).iconColor, /**< Fetch user icon color */
                     timestamp: Date.now(),
                     id: base64id.generateId()
                 };
@@ -159,6 +143,26 @@ io.on("connection", (socket) => {
         }
     });
 
+    /** A user gives the server their room and username
+     *    sends user to room
+     *    adds user ID and name to mapped list
+     *    sends new user data to clients
+     */
+    socket.on("setUserData", (room, username) => {
+        socket.join(room);
+        let userColor = generateMushroomColor();
+        let userExist = usersList.get(username);
+        if (userExist !== undefined) {
+            userExist.socket = socket.id;
+        } else {
+            /* icon color should be stored along with any other metadata we deem fit for the user */
+            usersList.set(username, {socket: socket.id, iconColor: userColor});
+        }
+        socket.emit("setRoomHistory", chatHistory[room], room);
+        io.emit("updateUsers", "add", username, userColor);
+    });
+
+    
     /** A user disconnects from the server
      *    log their disconnection
      *    tell users the username who left
