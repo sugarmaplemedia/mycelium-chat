@@ -1,14 +1,12 @@
 /** Socket.io client-side setup */
 const socket = io();
 
-const mushroom_icon_size = 20;
-
 /** Vue app setup */
 Vue.createApp({
     data() {
         return {
             /** Metadata */
-            author: "guest", // Client username
+            author: "", // Client username
             room: "", // Room the client is in
             users: [], // Users connected to chat
             rooms: [], // Available rooms to join
@@ -20,17 +18,7 @@ Vue.createApp({
 
         };
     },
-    created() {
-        //generate random name if no login provided.
-        if(this.author === "")
-        {
-            this.author = "guest-" + this.makeid(5);
-        }
-    },
     mounted() {
-        /** Auto-select username input on mount */
-        document.getElementById("username-set").select();
-
         /** Initialize global chatroom */
         socket.on("init", (chat, users, rooms) => {
             this.history = chat;
@@ -39,24 +27,9 @@ Vue.createApp({
         });
 
         /** Receive room chat history and switch over viewable messages */
-        socket.on("setRoomHistory", roomHistory => {
+        socket.on("setRoomHistory", (roomHistory, room) => {
             this.history = roomHistory;
-        });
-
-        /** Receive users from server, and:
-         *    add: add them to the list of users
-         *    remove: remove them from the list of users
-         */
-        socket.on("updateUsers", (action, username, icon_color) => {
-            switch (action) {
-                case "add":
-                    this.users.push([username, {icon_color: icon_color}]);
-                    break;
-                case "remove":
-                    console.log(username + " has left");
-                    this.users.splice(this.users.findIndex(user => user[0] == username), 1);
-                    break;
-            }
+            this.room = room;
         });
 
         /** Receive message from server, and:
@@ -64,7 +37,7 @@ Vue.createApp({
          *    update: use that message's ID to update a message in the chat history
          *    delete: use that message's ID to delete a message from the chat history 
          */
-        socket.on("updateChat", (action, message) => {
+         socket.on("updateChat", (action, message) => {
             switch (action) {
                 case "new":
                     this.history.push(message);
@@ -83,6 +56,21 @@ Vue.createApp({
             }
         });
 
+        /** Receive users from server, and:
+         *    add: add them to the list of users
+         *    remove: remove them from the list of users
+         */
+        socket.on("updateUsers", (action, username, iconColor) => {
+            switch (action) {
+                case "add":
+                    this.users.push([username, {iconColor: iconColor}]);
+                    break;
+                case "remove":
+                    console.log(username + " has left");
+                    this.users.splice(this.users.findIndex(user => user[0] == username), 1);
+                    break;
+            }
+        });
     },
     methods: {
         /** Add username to text query */
@@ -91,15 +79,52 @@ Vue.createApp({
             document.getElementById("message-input").select();
         },
 
+        /** Check if a message includes the name of the current user */
+        checkForMention(str) {
+            if(str.includes('@' + this.author)) return true;
+            return false;
+        },
+
+        /*
+         * Each icon color filter has a unique id based on the index of the message being rendered
+         * we need to use this or it will only apply one filter all mushrooms.
+         */
+        getIconColorFilter(id) {
+            const mushroomIconSize = 20;
+
+            return {
+                '-webkit-filter': 'url(#picked-filter' + id + ')',
+                'filter': 'url(#picked-filter' + id + ')',
+                'font-size': mushroomIconSize + 'px',
+            }
+        },
+
+        setRoom(roomName) {
+            socket.emit("setRoom", roomName);
+        },
+
         /** Set username and room, and send them to the server */
-        setUserData(){
-            this.room = document.getElementById("room-set").value;
-            this.author = document.getElementById("username-set").value;
-            socket.emit("setUserData", this.room, this.author);
+        setUserData() {
+            // generate random name if no login provided.
+            if (document.getElementById("username-set").value == "") {
+                let guestId = '';
+                let ASCII_S = 48;  /*< ASCI START */
+                let ASCII_E = 122; /*< ASCI END */
+                for ( let i = 0; i < 5; i++ ) {
+                    guestId += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
+                }
+
+                this.author = "guest-" + guestId;
+            } else {
+                this.author = document.getElementById("username-set").value;
+            }
+
+            socket.emit("setUserData", document.getElementById("room-set").value, this.author);
 
             document.getElementById("userdata-modal").classList.toggle("hideModal");
             document.getElementById("message-input").select();
         },
+
         /** Take text from an input box and send it to the server in order to:
          *    new: push a new message to the chat history
          *    update: update a message within the chat history
@@ -138,32 +163,9 @@ Vue.createApp({
                     socket.emit("updateChat", this.room, "delete", message);
                     break;
             }
-        },
-        makeid(length) {
-            let result = '';
-            let ASCII_S = 48;  /*< ASCI START */
-            let ASCII_E = 122; /*< ASCI END */
-            for ( let i = 0; i < length; i++ ) {
-                result += String.fromCharCode(Math.random() * (ASCII_E - ASCII_S + 1) + ASCII_S);
-            }
-            return result;
-        },
-
-        check_for_mention(str) {
-            if(str.includes('@' + this.author)) return true;
-            return false;
-        },
-
-        /*
-         * Each icon color filter has a unique id based on the index of the message being rendered
-         * we need to use this or it will only apply one filter all mushrooms.
-         */
-        get_icon_color_filter(id){
-            return {
-                '-webkit-filter': 'url(#picked-filter' + id + ')',
-                'filter': 'url(#picked-filter' + id + ')',
-                'font-size': mushroom_icon_size + 'px',
-            }
         }
-    },
+    }
 }).mount('#app');
+
+/** Auto-select username input on mount */
+document.getElementById("username-set").select();

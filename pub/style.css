@@ -25,7 +25,7 @@ html {
     transform: scale(1.1);
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
     
-    opacity: 0;
+    opacity: 1;
     background-color: rgb(20 10 5 / 0.9);
 
     display: flex;
@@ -75,14 +75,15 @@ html {
     box-shadow: 2px 2px 4px var(--clr-shadow);
 }
 
-#room-set {
+.room-set {
+    height: auto;
     background-color: var(--clr-med);
     border: 0.125rem solid var(--clr-dark);
     border-radius: 3px;
     box-shadow: 1px 1px 3px var(--clr-shadow);
 }
 
-#room-set:hover {
+.room-set:hover {
     cursor: pointer;
 }
 
@@ -104,8 +105,6 @@ html {
 #room-set {
     grid-column: 1 / 4;
 }
-
-
 
 svg {
     position: absolute;
@@ -130,7 +129,7 @@ svg {
 }
 
 #title-box {
-    padding-left: 0.5rem;
+    padding: 0 0.5rem;
 
     grid-area: title;
 
@@ -142,6 +141,11 @@ svg {
 
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+
+#title-room-set {
+    height: 80%;
 }
 
 #userlist-box {
@@ -231,12 +235,6 @@ svg {
     background-image: linear-gradient(to right, var(--clr-med), var(--clr-bg) 20%);
 }
 
-.chat-message-referenced {
-    padding-left: 1rem;
-
-    background-image: linear-gradient(to right, var(--clr-med), var(--clr-bg) 20%);
-}
-
 .chat-message-meta .update, .chat-message-meta .delete {
     height: 1.5rem;
 
@@ -244,6 +242,7 @@ svg {
 
     display: inline;
 }
+
 .chat-message:hover .update, .chat-message:hover .delete {
     transform: scale(1) translateY(7px);
 }
@@ -272,7 +271,7 @@ svg {
 }
 
 .chat-message-body {
-    padding: 0.28rem 0 0 0.5rem;
+    padding: 0.30rem 0 0 0.5rem;
     flex-grow: 1;
 }
 
@@ -336,6 +335,8 @@ svg {
     transform: translate(-1px, -1px) scale(1.01);
 
     box-shadow: 2px 2px 4px var(--clr-shadow);
+
+    cursor: pointer;
 }
 
 @media only screen and (max-width: 830px) {

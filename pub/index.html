@@ -20,7 +20,7 @@
                     <label for="username-set">Enter Username:</label><br />
                     <input id="username-set" type="text" @keydown.enter="setUserData" autofocus/>
                 </div>
-                <select id="room-set">
+                <select id="room-set" class="room-set" >
                     <option v-for="room in rooms" :value="room">{{room}}</option>
                 </select>
                 <button @click="setUserData">submit</button>
@@ -29,6 +29,9 @@
         <div id="app-content">
             <section id="title-box">
                 <h1>🍄 mycelium chat</h1>
+                <select id="title-room-set" class="room-set">
+                    <option v-for="room in rooms" :value="room" @click="setRoom(room)">{{room}}</option>
+                </select>
             </section>
             <section id="userlist-box">
                 <div id="userlist-title">
@@ -40,10 +43,10 @@
                             <span class="mushroom">
                                 <svg height="100" width="100">
                                     <filter :id="'picked-filter' + idx">
-                                        <feColorMatrix type="matrix" :values="users[idx][1].icon_color"/>
+                                        <feColorMatrix type="matrix" :values="users[idx][1].iconColor"/>
                                     </filter>
                                 </svg>
-                                <span :style="get_icon_color_filter(idx)">🍄</span>
+                                <span :style="getIconColorFilter(idx)">🍄</span>
                             </span>
                             {{users[idx][0]}}
                         </p>
@@ -65,15 +68,15 @@
                             <span class="mushroom">
                                 <svg height="100" width="100">
                                     <filter :id="'picked-filter' + idx">
-                                        <feColorMatrix type="matrix" :values="data.icon_color"/>
+                                        <feColorMatrix type="matrix" :values="data.iconColor"/>
                                     </filter>
                                 </svg>
-                                <span :style="get_icon_color_filter(idx)">🍄</span>
+                                <span :style="getIconColorFilter(idx)">🍄</span>
                             </span>
                             <span class="author">{{data.author}}:</span>
                         </div>
                         <div class="chat-message-body">
-                            <p v-if="check_for_mention(data.text)">
+                            <p v-if="checkForMention(data.text)">
                                 <strong>{{data.text}}</strong>
                             </p>
                             <p v-else>
